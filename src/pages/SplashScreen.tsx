@@ -34,16 +34,14 @@ const SplashScreen = () => {
           />
           
           {/* Logo icon */}
-          <motion.div
-            className="relative z-10 w-28 h-28 rounded-[28px] bg-foreground flex items-center justify-center mb-6 shadow-2xl"
+          <motion.img
+            className="relative z-10 mb-6 w-44 max-w-[70vw] drop-shadow-2xl"
+            src="/images/logo/wego_logo.svg"
+            alt="Wego"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
-          >
-            <span className="text-5xl font-bold text-background tracking-tighter" style={{ fontFamily: 'Georgia, serif' }}>
-              We
-            </span>
-          </motion.div>
+          />
 
           {/* Brand name */}
           <motion.h1
@@ -52,8 +50,7 @@ const SplashScreen = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.6 }}
           >
-            <span style={{ fontFamily: 'Georgia, serif' }}>We</span>
-            <span className="font-extrabold">go</span>
+            Wego
           </motion.h1>
 
           {/* Tagline */}

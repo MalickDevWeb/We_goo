@@ -12,6 +12,7 @@ import OnboardingScreen from "@/pages/OnboardingScreen";
 import ServicesScreen from "@/pages/ServicesScreen";
 import LoginScreen from "@/pages/LoginScreen";
 import AdminLoginScreen from "@/pages/AdminLoginScreen";
+import BrandAssets from "@/pages/BrandAssets";
 
 import UserDashboard from "@/pages/user/UserDashboard";
 import UserBooking from "@/pages/user/UserBooking";
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/services" element={<ServicesScreen />} />
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/admin-login" element={<AdminLoginScreen />} />
+          <Route path="/brand-assets" element={<BrandAssets />} />
 
           {/* User (with tab layout) */}
           <Route path="/user" element={<RequireAuth allowedRoles={['user']}><UserLayout /></RequireAuth>}>

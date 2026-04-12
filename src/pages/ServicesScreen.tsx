@@ -21,12 +21,12 @@ const ServicesScreen = () => {
       {/* Header */}
       <div className="px-6 pt-8 pb-4">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-foreground flex items-center justify-center">
-            <span className="text-lg font-bold text-background" style={{ fontFamily: 'Georgia, serif' }}>We</span>
-          </div>
-          <span className="text-xl font-bold text-foreground">
-            <span style={{ fontFamily: 'Georgia, serif' }}>We</span>go
-          </span>
+          <img
+            src="/images/logo/wego_logo.svg"
+            alt="Wego"
+            className="h-10 w-auto"
+          />
+          <span className="text-xl font-bold text-foreground">Wego</span>
         </div>
         <h1 className="text-2xl font-bold text-foreground mt-6">{t('services.title')}</h1>
       </div>
