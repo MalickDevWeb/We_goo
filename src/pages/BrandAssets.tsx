@@ -1,12 +1,15 @@
 const WEGO_IMAGES = [
   "AF_BRANDING_WEGO_images-000.jpg",
-  "AF_BRANDING_WEGO_images-006.jpg",
-  "AF_BRANDING_WEGO_images-007.jpg",
-  "AF_BRANDING_WEGO_images-009.jpg",
-  "AF_BRANDING_WEGO_images-010.jpg",
-  "AF_BRANDING_WEGO_images-011.jpg",
-  "AF_BRANDING_WEGO_images-013.jpg",
   "logo-clean.png",
+  "portable.jpg",
+  "voiture.jpg",
+  "voiture2.jpg",
+  "sac2.jpg",
+  "sac3.jpg",
+  "sacs.jpg",
+  "Promotions vibrantes pour l'application Wego.png",
+  "Services de l'app _We_ en action.png",
+  "Voyage, santé et shopping avec We.png",
 ] as const;
 
 const BrandAssets = () => {
@@ -29,7 +32,7 @@ const BrandAssets = () => {
 
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {WEGO_IMAGES.map((filename) => {
-            const src = `/images/wego/${filename}`;
+            const src = encodeURI(`/images/wego/${filename}`);
             return (
               <figure key={filename} className="glass overflow-hidden rounded-2xl">
                 <div className="aspect-[4/3] w-full overflow-hidden bg-muted/20">
@@ -58,4 +61,3 @@ const BrandAssets = () => {
 };
 
 export default BrandAssets;
-

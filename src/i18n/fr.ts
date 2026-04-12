@@ -10,6 +10,7 @@ const fr = {
     edit: "Modifier",
     back: "Retour",
     next: "Suivant",
+    continue: "Continuer",
     skip: "Passer",
     search: "Rechercher",
     noResults: "Aucun résultat",

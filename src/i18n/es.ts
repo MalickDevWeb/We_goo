@@ -10,6 +10,7 @@ const es = {
     edit: "Editar",
     back: "Volver",
     next: "Siguiente",
+    continue: "Continuar",
     skip: "Omitir",
     search: "Buscar",
     noResults: "Sin resultados",
