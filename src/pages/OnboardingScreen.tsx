@@ -94,7 +94,7 @@ const OnboardingScreen = () => {
           {/* CTA */}
           <button
             onClick={handleContinue}
-            className="mt-6 w-full rounded-2xl bg-white/90 py-4 text-lg font-semibold text-black tap-target backdrop-blur-md transition-transform active:scale-[0.98]"
+            className="mt-6 w-full rounded-2xl gradient-accent text-accent-foreground py-4 text-lg font-semibold tap-target transition-transform active:scale-[0.98]"
           >
             {t('common.continue')}
           </button>

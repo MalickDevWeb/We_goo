@@ -19,9 +19,8 @@ const ServicesScreen = () => {
 
   return (
     <div className="h-[100svh] overflow-hidden bg-background safe-top safe-bottom flex flex-col">
-      {/* Cadre image (au-dessus des catégories) */}
-      <div className="px-6 pt-4">
-        <div className="relative overflow-hidden rounded-3xl h-[131px] glass">
+      <div className="px-6 pt-4 flex-none">
+        <div className="relative overflow-hidden rounded-2xl h-[120px] glass">
           <img
             src={heroService.imageSrc}
             alt=""

@@ -12,18 +12,18 @@ export type ServiceItem = {
 };
 
 export const servicesCatalog: ServiceItem[] = [
-  { key: 'rides', icon: Car, available: true, imageSrc: '/images/wego/voiture.jpg' },
-  { key: 'packages', icon: Package, available: true, imageSrc: '/images/wego/sacs.jpg' },
-  { key: 'rental', icon: CarFront, available: false, flag: 'version2_vehicle_rental', imageSrc: '/images/wego/voiture2.jpg' },
-  { key: 'commerce', icon: ShoppingBag, available: false, flag: 'version2_commerce', imageSrc: '/images/wego/portable.jpg' },
+  { key: 'rides', icon: Car, available: true, imageSrc: '/images/photos/location_voiture.png' },
+  { key: 'packages', icon: Package, available: true, imageSrc: '/images/photos/colis.png' },
+  { key: 'rental', icon: CarFront, available: false, flag: 'version2_vehicle_rental', imageSrc: '/images/photos/location_voiture_avec_cle.png' },
+  { key: 'commerce', icon: ShoppingBag, available: false, flag: 'version2_commerce', imageSrc: '/images/photos/achats_robe.png' },
   {
     key: 'restaurants',
     icon: UtensilsCrossed,
     available: false,
     flag: 'version2_restaurants',
-    imageSrc: "/images/wego/Promotions vibrantes pour l'application Wego.png",
+    imageSrc: '/images/photos/achat_restaurant.png',
   },
-  { key: 'hotels', icon: Hotel, available: false, flag: 'version2_hotels', imageSrc: '/images/wego/AF_BRANDING_WEGO_images-000.jpg' },
+  { key: 'hotels', icon: Hotel, available: false, flag: 'version2_hotels', imageSrc: '/images/photos/location_immobilier.png' },
 ];
 
 export function isServiceKey(value: string): value is ServiceKey {
