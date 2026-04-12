@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* WEGO Brand Palette */
+    --background: 230 60% 9%;
+    --foreground: 0 0% 98%;
+
+    --card: 230 45% 12%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 230 45% 12%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 224 42% 26%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 230 35% 18%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 230 30% 16%;
+    --muted-foreground: 220 15% 55%;
+
+    --accent: 345 79% 51%;
+    --accent-foreground: 0 0% 100%;
+
+    --accent2: 94 52% 67%;
+    --accent2-foreground: 230 60% 9%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 230 30% 20%;
+    --input: 230 30% 20%;
+    --ring: 345 79% 51%;
+
+    --radius: 1.375rem;
+
+    /* Glass */
+    --glass-bg: 230 45% 12%;
+    --glass-border: 230 30% 25%;
+
+    /* Gradients */
+    --gradient-accent: linear-gradient(135deg, hsl(345 79% 51%), hsl(345 79% 40%));
+    --gradient-card: linear-gradient(145deg, hsl(230 45% 14%), hsl(230 45% 10%));
+    --gradient-hero: linear-gradient(180deg, hsl(230 60% 12%), hsl(230 60% 6%));
+
+    /* Sidebar (unused but required) */
+    --sidebar-background: 230 45% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 345 79% 51%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 35% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 230 30% 20%;
+    --sidebar-ring: 345 79% 51%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: hsl(var(--glass-bg) / 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--glass-border) / 0.3);
+  }
+
+  .glass-strong {
+    background: hsl(var(--glass-bg) / 0.8);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid hsl(var(--glass-border) / 0.4);
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, hsl(345 79% 51%), hsl(330 70% 42%));
+  }
+
+  .gradient-card {
+    background: linear-gradient(145deg, hsl(230 45% 14%), hsl(230 45% 10%));
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 15% 70%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 40px hsl(345 79% 51% / 0.3), 0 0 80px hsl(345 79% 51% / 0.1);
+  }
+
+  .glow-green {
+    box-shadow: 0 0 30px hsl(94 52% 67% / 0.3);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 16px);
+  }
+
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .antialiased {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
