@@ -43,7 +43,6 @@ const UserDashboard = () => {
   const user = profile as User | null;
 
   const quickActions = [
-    { icon: MessageCircle, label: t('user.chat.title'), path: '/user/chat', color: 'text-accent' },
     { icon: AlertTriangle, label: t('user.emergency.title'), path: '/user/emergency', color: 'text-destructive' },
     { icon: Package, label: t('user.package.title'), path: '/user/package', color: 'text-accent2' },
     { icon: Search, label: t('user.lostItem.title'), path: '/user/lost-item', color: 'text-foreground' },
@@ -124,6 +123,15 @@ const UserDashboard = () => {
           <RidesList userId={user?.id || 0} />
         )}
       </motion.div>
+
+      {/* FAB Chat */}
+      <button
+        onClick={() => navigate('/user/chat')}
+        className="fixed bottom-[90px] right-6 w-14 h-14 bg-accent rounded-full shadow-lg shadow-accent/40 flex items-center justify-center text-white tap-target transition-transform active:scale-95 z-50"
+        aria-label={t('user.chat.title')}
+      >
+        <MessageCircle className="w-6 h-6" />
+      </button>
     </div>
   );
 };

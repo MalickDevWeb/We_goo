@@ -25,6 +25,8 @@ const LoginScreen = () => {
   const [foundUser, setFoundUser] = useState<Awaited<ReturnType<typeof api.getUserByPhone>> | null>(null);
   const [foundDriver, setFoundDriver] = useState<Awaited<ReturnType<typeof api.getDriverByPhone>> | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [shake, setShake] = useState(false);
 
   const handleSendOtp = async () => {
     if (!phone.trim()) return;
@@ -34,7 +36,9 @@ const LoginScreen = () => {
 
   const handleVerifyOtp = async () => {
     if (otp !== '1234') {
-      toast.error(t('auth.otpError'));
+      setErrorMsg(t('auth.otpError'));
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
       return;
     }
     setLoading(true);
@@ -103,8 +107,8 @@ const LoginScreen = () => {
         <div className="flex justify-center mb-12">
           <motion.img
             initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            animate={{ opacity: 1, scale: 1, x: shake ? [-10, 10, -8, 8, -5, 5, 0] : 0 }}
+            transition={{ duration: shake ? 0.4 : 0.5 }}
             src="/images/logo/wego_logo.svg"
             alt="We_goo"
             className="h-[135px] w-auto drop-shadow-sm"
@@ -146,17 +150,24 @@ const LoginScreen = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground mb-2">{t('auth.otp')}</h1>
                 <p className="text-muted-foreground mb-8">{phone}</p>
-                <div className="relative mb-6">
+                {errorMsg && (
+                  <p className="text-destructive text-center text-sm font-medium mb-4">{errorMsg}</p>
+                )}
+                <motion.div 
+                  className="relative mb-6"
+                  animate={shake ? { x: [-8, 8, -6, 6, -3, 3, 0] } : {}}
+                  transition={{ duration: 0.4 }}
+                >
                   <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
                     value={otp}
-                    onChange={e => setOtp(e.target.value)}
+                    onChange={e => { setOtp(e.target.value); setErrorMsg(''); }}
                     placeholder={t('auth.otpPlaceholder')}
                     maxLength={4}
-                    className="w-full py-4 pl-12 pr-4 rounded-xl bg-secondary text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-accent tap-target text-center text-2xl tracking-[0.5em]"
+                    className={`w-full py-4 pl-12 pr-4 rounded-xl bg-secondary text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 tap-target text-center text-2xl tracking-[0.5em] ${errorMsg ? 'ring-2 ring-destructive' : 'focus:ring-accent'}`}
                   />
-                </div>
+                </motion.div>
                 <button
                   onClick={handleVerifyOtp}
                   disabled={otp.length < 4 || loading}
