@@ -1,36 +1,24 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Car, Package, CarFront, ShoppingBag, UtensilsCrossed, Hotel, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
-
-// Liste des services affichés sur la page `/services`.
-// - `key` correspond aux clés i18n (`services.<key>.title/desc`)
-// - `available` active/désactive la carte
-// - `flag` (optionnel) est prévu pour un feature-flag (v2) si besoin
-const servicesList = [
-  { key: 'rides', icon: Car, available: true, imageSrc: '/images/wego/voiture.jpg' },
-  { key: 'packages', icon: Package, available: true, imageSrc: '/images/wego/sacs.jpg' },
-  { key: 'rental', icon: CarFront, available: false, flag: 'version2_vehicle_rental', imageSrc: '/images/wego/voiture2.jpg' },
-  { key: 'commerce', icon: ShoppingBag, available: false, flag: 'version2_commerce', imageSrc: '/images/wego/portable.jpg' },
-  { key: 'restaurants', icon: UtensilsCrossed, available: false, flag: 'version2_restaurants', imageSrc: "/images/wego/Promotions vibrantes pour l'application Wego.png" },
-  { key: 'hotels', icon: Hotel, available: false, flag: 'version2_hotels', imageSrc: '/images/wego/AF_BRANDING_WEGO_images-000.jpg' },
-];
+import { servicesCatalog, type ServiceKey } from '@/lib/servicesCatalog';
 
 const ServicesScreen = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [activeKey, setActiveKey] = useState<(typeof servicesList)[number]['key']>('rides');
+  const [activeKey, setActiveKey] = useState<ServiceKey>('rides');
 
   const visibleServices = useMemo(() => {
-    const index = Math.max(0, servicesList.findIndex((s) => s.key === activeKey));
-    const nextIndex = (index + 1) % servicesList.length;
-    return [servicesList[index], servicesList[nextIndex]];
+    const index = Math.max(0, servicesCatalog.findIndex((s) => s.key === activeKey));
+    const nextIndex = (index + 1) % servicesCatalog.length;
+    return [servicesCatalog[index], servicesCatalog[nextIndex]];
   }, [activeKey]);
   const heroService = visibleServices[0];
 
   return (
-    <div className="min-h-screen bg-background safe-top safe-bottom">
+    <div className="h-[100svh] overflow-hidden bg-background safe-top safe-bottom flex flex-col">
       {/* Cadre image (au-dessus des catégories) */}
       <div className="px-6 pt-4">
         <div className="relative overflow-hidden rounded-3xl h-[131px] glass">
@@ -56,9 +44,9 @@ const ServicesScreen = () => {
       </div>
 
       {/* Cadres en haut (catégories) */}
-      <div className="px-6 pt-5 pb-5">
+      <div className="px-6 pt-3 pb-3">
         <div className="flex gap-4 overflow-x-auto no-scrollbar">
-          {servicesList.map((service) => {
+          {servicesCatalog.map((service) => {
             const Icon = service.icon;
             const selected = service.key === activeKey;
             return (
@@ -70,11 +58,11 @@ const ServicesScreen = () => {
               >
                 <div className="flex flex-col items-center gap-2 w-[76px]">
                   <div
-                    className={`w-16 h-16 rounded-full flex items-center justify-center border transition-colors ${
+                    className={`w-14 h-14 rounded-full flex items-center justify-center border transition-colors ${
                       selected ? 'bg-accent/25 border-accent/60 ring-4 ring-accent/10' : 'bg-transparent border-border/40'
                     }`}
                   >
-                    <Icon className={`w-7 h-7 ${selected ? 'text-accent' : 'text-muted-foreground'}`} />
+                    <Icon className={`w-6 h-6 ${selected ? 'text-accent' : 'text-muted-foreground'}`} />
                   </div>
                   <div
                     className={`text-xs font-medium text-center ${
@@ -91,8 +79,8 @@ const ServicesScreen = () => {
       </div>
 
       {/* 2 cartes seulement (elles changent selon la catégorie sélectionnée) */}
-      <div className="px-6 pb-6">
-        <div className="grid grid-cols-1 gap-4">
+      <div className="px-6 pb-4 flex-1 min-h-0">
+        <div className="grid grid-cols-1 grid-rows-2 gap-3 h-full">
           {visibleServices.map((service, i) => {
             const Icon = service.icon;
             return (
@@ -101,13 +89,12 @@ const ServicesScreen = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                onClick={() => (service.available ? navigate('/login') : undefined)}
-                disabled={!service.available}
+                onClick={() => navigate(`/services/${service.key}`)}
                 className={`glass rounded-3xl overflow-hidden text-left transition-all tap-target ${
                   service.available ? 'active:scale-[0.99]' : 'opacity-60'
                 }`}
               >
-                <div className="relative h-[161px]">
+                <div className="relative h-full">
                   <img src={service.imageSrc} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   {!service.available && (
@@ -139,10 +126,10 @@ const ServicesScreen = () => {
       </div>
 
       {/* CTA: accès utilisateur + accès admin */}
-      <div className="px-6 pb-8">
+      <div className="px-6 pb-4">
         <button
           onClick={() => navigate('/login')}
-          className="w-full py-4 rounded-xl gradient-accent text-accent-foreground font-semibold text-lg tap-target flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+          className="w-full py-3 rounded-xl gradient-accent text-accent-foreground font-semibold text-base tap-target flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
         >
           {t('services.access')}
           <ArrowRight className="w-5 h-5" />

@@ -10,6 +10,7 @@ import UserLayout from "@/components/UserLayout";
 import SplashScreen from "@/pages/SplashScreen";
 import OnboardingScreen from "@/pages/OnboardingScreen";
 import ServicesScreen from "@/pages/ServicesScreen";
+import ServiceDetailsScreen from "@/pages/ServiceDetailsScreen";
 import LoginScreen from "@/pages/LoginScreen";
 import AdminLoginScreen from "@/pages/AdminLoginScreen";
 import BrandAssets from "@/pages/BrandAssets";
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/" element={<SplashScreen />} />
           <Route path="/onboarding" element={<OnboardingScreen />} />
           <Route path="/services" element={<ServicesScreen />} />
+          <Route path="/services/:serviceKey" element={<ServiceDetailsScreen />} />
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/admin-login" element={<AdminLoginScreen />} />
           <Route path="/brand-assets" element={<BrandAssets />} />
