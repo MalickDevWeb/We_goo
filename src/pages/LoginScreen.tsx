@@ -99,7 +99,17 @@ const LoginScreen = () => {
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center px-6">
+      <div className="flex-1 flex flex-col justify-center px-6 -mt-16">
+        <div className="flex justify-center mb-12">
+          <motion.img
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            src="/images/logo/wego_logo.svg"
+            alt="We_goo"
+            className="h-[135px] w-auto drop-shadow-sm"
+          />
+        </div>
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -110,8 +120,8 @@ const LoginScreen = () => {
           >
             {step === 'phone' && (
               <div>
-                <h1 className="text-2xl font-bold text-foreground mb-2">{t('auth.title')}</h1>
-                <p className="text-muted-foreground mb-8">{t('auth.phone')}</p>
+                <h1 className="text-3xl font-bold text-foreground mb-2 text-center">{t('auth.title')}</h1>
+                <p className="text-muted-foreground mb-8 text-center">{t('auth.phone')}</p>
                 <div className="relative mb-6">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input

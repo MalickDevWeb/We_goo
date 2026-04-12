@@ -99,14 +99,7 @@ const ServiceDetailsScreen = () => {
         </div>
       </div>
 
-      <div className="px-6 pt-4">
-        <div className="text-lg font-semibold text-foreground">
-          {t(`services.${safeKey}.title`)}
-        </div>
-        <div className="mt-2 text-muted-foreground text-sm">
-          {t(`services.${safeKey}.desc`)}
-        </div>
-      </div>
+
 
       {/* Contenu spécifique selon le service */}
       <div className="px-6 pt-4 space-y-4">
@@ -317,16 +310,7 @@ const ServiceDetailsScreen = () => {
                 ))}
               </div>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Zap className="w-3 h-3" />
-                <span>Livraison rapide</span>
-              </div>
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Shield className="w-3 h-3" />
-                <span>Paiement sécurisé</span>
-              </div>
-            </div>
+
           </div>
         )}
 
@@ -378,16 +362,7 @@ const ServiceDetailsScreen = () => {
                 ))}
               </div>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Zap className="w-3 h-3" />
-                <span>Livraison 30min</span>
-              </div>
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Shield className="w-3 h-3" />
-                <span>Paiement sécurisé</span>
-              </div>
-            </div>
+
           </div>
         )}
 
