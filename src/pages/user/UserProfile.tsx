@@ -23,7 +23,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="safe-top px-6 pb-6">
+    <div className="min-h-full safe-top px-6 pb-6">
       <h1 className="text-xl font-bold text-foreground pt-6 mb-6">{t('user.profile.title')}</h1>
 
       <div className="glass rounded-2xl p-5 mb-6 flex items-center gap-4">

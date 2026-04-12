@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Wallet, Plus, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { Wallet, Plus, ArrowUpCircle, ArrowDownCircle, Car, TrendingUp, AlertTriangle, Search, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 import * as api from '@/services/api';
@@ -10,6 +11,7 @@ import type { Transaction, User } from '@/types';
 const UserWallet = () => {
   const { t } = useTranslation();
   const { session, profile, setProfile } = useAuthStore();
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [rechargeAmount, setRechargeAmount] = useState('');
   const [showRecharge, setShowRecharge] = useState(false);
@@ -42,7 +44,7 @@ const UserWallet = () => {
   };
 
   return (
-    <div className="safe-top px-6 pb-6">
+    <div className="min-h-full safe-top px-6 pb-20">
       <h1 className="text-xl font-bold text-foreground pt-6 mb-6">{t('user.wallet.title')}</h1>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-2xl p-6 mb-6 text-center">
@@ -80,6 +82,38 @@ const UserWallet = () => {
           </button>
         </motion.div>
       )}
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="glass rounded-2xl p-4 text-center">
+          <Car className="w-5 h-5 text-accent mx-auto mb-2" />
+          <p className="text-2xl font-bold text-foreground">{user?.totalRides || 0}</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">{t('user.dashboard.rides')}</p>
+        </div>
+        <div className="glass rounded-2xl p-4 text-center">
+          <TrendingUp className="w-5 h-5 text-accent2 mx-auto mb-2" />
+          <p className="text-2xl font-bold text-foreground">${user?.totalSpent || 0}</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">{t('user.dashboard.spent')}</p>
+        </div>
+      </div>
+
+      {/* Support Actions */}
+      <div className="grid grid-cols-2 gap-3 mb-8">
+        <button
+          onClick={() => navigate('/user/emergency')}
+          className="glass border-destructive/20 rounded-2xl p-4 flex flex-col items-center gap-2 tap-target active:scale-[0.98]"
+        >
+          <AlertTriangle className="w-6 h-6 text-destructive" />
+          <span className="text-xs font-semibold text-foreground">{t('user.emergency.title')}</span>
+        </button>
+        <button
+          onClick={() => navigate('/user/lost-item')}
+          className="glass rounded-2xl p-4 flex flex-col items-center gap-2 tap-target active:scale-[0.98]"
+        >
+          <Search className="w-6 h-6 text-muted-foreground" />
+          <span className="text-xs font-semibold text-foreground">{t('user.lostItem.title')}</span>
+        </button>
+      </div>
 
       <h2 className="text-lg font-semibold text-foreground mb-4">{t('user.wallet.transactions')}</h2>
       {transactions.length === 0 ? (

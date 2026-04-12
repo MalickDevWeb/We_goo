@@ -16,8 +16,8 @@ const UserLayout = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex-1 overflow-y-auto">
+    <div className="min-h-screen max-h-screen bg-background flex flex-col overflow-hidden">
+      <div className="flex-1 overflow-y-auto no-scrollbar">
         <Outlet />
       </div>
 

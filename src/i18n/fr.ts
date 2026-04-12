@@ -84,6 +84,7 @@ const fr = {
       recentRides: "Trajets récents",
       noRides: "Vous n'avez pas encore de trajets",
       bookNow: "Réserver maintenant",
+      chooseService: "Choisir un service",
     },
     booking: {
       title: "Réserver un trajet",
