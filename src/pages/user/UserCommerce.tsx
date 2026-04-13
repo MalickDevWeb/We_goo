@@ -226,7 +226,7 @@ const UserCommerce = () => {
         </div>
       </header>
 
-      <div className="px-6 space-y-6 flex-1 pb-10">
+      <div className="px-6 space-y-6 flex-1 pb-32">
         {/* Search Bar */}
         <div className="relative group">
           <div className="absolute inset-0 bg-accent/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity rounded-3xl" />

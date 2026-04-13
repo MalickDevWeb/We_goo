@@ -204,7 +204,7 @@ const UserRestaurants = () => {
         </div>
       </header>
 
-      <div className="px-6 space-y-6 flex-1 pb-10">
+      <div className="px-6 space-y-6 flex-1 pb-32">
         {/* Search Bar */}
         <div className="relative glass rounded-[24px] flex items-center px-5 py-4 border border-white/5 focus-within:border-accent/40 transition-all">
           <Search className="w-5 h-5 text-white/30 mr-3" />

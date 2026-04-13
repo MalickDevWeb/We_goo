@@ -143,7 +143,7 @@ const UserRental = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-foreground flex flex-col safe-top safe-bottom overflow-x-hidden">
+    <div className="min-h-screen bg-[#0A0A0B] text-foreground flex flex-col safe-top overflow-x-hidden">
       {/* Background Decorative Halos */}
       <div className="fixed top-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/10 blur-[120px] rounded-full -z-10" />
       <div className="fixed bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent/10 blur-[100px] rounded-full -z-10" />
@@ -163,7 +163,7 @@ const UserRental = () => {
         </button>
       </header>
 
-      <div className="px-6 space-y-6 flex-1 pb-10">
+      <div className="px-6 space-y-6 flex-1 pb-32">
         {/* Search */}
         <div className="relative glass rounded-[24px] flex items-center px-5 py-4 border border-white/5 focus-within:border-accent/40 transition-all">
           <Search className="w-5 h-5 text-white/30 mr-3" />

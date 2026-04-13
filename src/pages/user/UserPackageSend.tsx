@@ -144,7 +144,7 @@ const UserPackageSend = () => {
         <h1 className="text-lg font-bold text-foreground ml-2">{t('user.package.title')}</h1>
       </div>
 
-      <div className="px-6 pt-6">
+      <div className="px-6 pt-6 pb-32">
         <AnimatePresence mode="wait">
           {step === 'form' && (
             <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6 relative z-10 w-full max-w-md mx-auto">
@@ -158,90 +158,101 @@ const UserPackageSend = () => {
                      ? "Profitez d'un fourgon Wego B2B déjà sur la route avec de l'espace libre." 
                      : "Un coursier dédié récupère et livre votre colis immédiatement."}
                  </p>
-              </div>
+                 
+                 {/* Connected Route Input Card */}
+                 <div className="glass rounded-[28px] p-2 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] border border-white/5 relative overflow-visible bg-gradient-to-b from-white/5 to-transparent mt-6">
+                    <div className="absolute top-1/2 left-0 -translate-y-1/2 w-32 h-32 bg-accent/20 blur-[50px] pointer-events-none -z-10 rounded-full" />
 
-              {/* Connected Route Input Card */}
-              <div className="glass rounded-[28px] p-2 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] border border-white/5 relative overflow-visible bg-gradient-to-b from-white/5 to-transparent">
-                 <div className="absolute top-1/2 left-0 -translate-y-1/2 w-32 h-32 bg-accent/20 blur-[50px] pointer-events-none -z-10 rounded-full" />
+                    <div className="relative flex gap-4 p-4 border-b border-white/5">
+                      <div className="flex flex-col items-center justify-start mt-2 relative z-10 w-4">
+                        <div className="w-4 h-4 rounded-full bg-accent/20 flex items-center justify-center border border-accent/40 shadow-[0_0_15px_rgba(230,32,87,0.4)] shrink-0">
+                          <div className="w-[5px] h-[5px] rounded-full bg-accent shadow-[0_0_8px_rgba(230,32,87,1)]" />
+                        </div>
+                        <div className="w-[1.5px] h-16 bg-gradient-to-b from-accent/60 to-transparent absolute top-5 rounded-full" />
+                      </div>
+                      <div className="flex-1 relative">
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-accent">Point de Collecte</label>
+                          <button onClick={useCurrentLocation} className="flex items-center gap-1 text-[9px] font-bold text-accent px-2 py-0.5 rounded bg-accent/10 hover:bg-accent/20 transition-colors">
+                            <Navigation className="w-2.5 h-2.5" /> Position actuelle
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Où récupérer le colis ?"
+                          value={form.pickupAddress}
+                          onChange={e => handleSearch(e.target.value, 'pickupAddress')}
+                          onFocus={() => setActiveField('pickupAddress')}
+                          className="w-full bg-transparent text-foreground text-[13px] font-bold placeholder:text-muted-foreground/40 outline-none pb-1"
+                        />
+                        {form.pickupAddress && (
+                          <button onClick={() => { update('pickupAddress', ''); setPickupCoords(null); setSuggestions([]); }} className="absolute right-0 bottom-1 p-1 text-muted-foreground hover:text-foreground transition-colors">
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
 
-                 <div className="relative flex gap-4 p-4 border-b border-white/5">
-                   <div className="flex flex-col items-center justify-start mt-2 relative z-10 w-4">
-                     <div className="w-4 h-4 rounded-full bg-accent/20 flex items-center justify-center border border-accent/40 shadow-[0_0_15px_rgba(230,32,87,0.4)] shrink-0">
-                       <div className="w-[5px] h-[5px] rounded-full bg-accent shadow-[0_0_8px_rgba(230,32,87,1)]" />
-                     </div>
-                     <div className="w-[1.5px] h-16 bg-gradient-to-b from-accent/60 to-transparent absolute top-5 rounded-full" />
-                   </div>
-                   <div className="flex-1 relative">
-                     <div className="flex justify-between items-center mb-1">
-                       <label className="text-[9px] font-black uppercase tracking-widest text-accent">Point de Collecte</label>
-                       <button onClick={useCurrentLocation} className="flex items-center gap-1 text-[9px] font-bold text-accent px-2 py-0.5 rounded bg-accent/10 hover:bg-accent/20 transition-colors">
-                         <Navigation className="w-2.5 h-2.5" /> Position actuelle
-                       </button>
-                     </div>
-                     <input
-                       type="text"
-                       placeholder="Où récupérer le colis ?"
-                       value={form.pickupAddress}
-                       onChange={e => handleSearch(e.target.value, 'pickupAddress')}
-                       onFocus={() => setActiveField('pickupAddress')}
-                       className="w-full bg-transparent text-foreground text-[13px] font-bold placeholder:text-muted-foreground/40 outline-none pb-1"
-                     />
-                     {form.pickupAddress && (
-                       <button onClick={() => { update('pickupAddress', ''); setPickupCoords(null); setSuggestions([]); }} className="absolute right-0 bottom-1 p-1 text-muted-foreground hover:text-foreground transition-colors">
-                         <X className="w-3.5 h-3.5" />
-                       </button>
-                     )}
-                     
-                     <AnimatePresence>
-                       {activeField === 'pickupAddress' && (suggestions.length > 0 || loadingSearch) && (
-                         <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute left-0 right-0 top-full mt-3 bg-card/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-y-auto max-h-[220px] z-[1000] ring-1 ring-black/50">
-                           {loadingSearch ? <div className="p-5 flex justify-center"><Loader2 className="w-4 h-4 animate-spin text-accent" /></div> : suggestions.map((s, idx) => (
-                             <button key={idx} onMouseDown={(e) => { e.preventDefault(); selectSuggestion(s); }} className="w-full p-4 flex items-start gap-3 hover:bg-white/5 transition-colors border-b border-white/5 text-left active:bg-white/10">
-                               <MapPin className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                               <span className="text-[11px] font-bold text-foreground leading-snug">{s.displayName}</span>
-                             </button>
-                           ))}
-                         </motion.div>
-                       )}
-                     </AnimatePresence>
-                   </div>
-                 </div>
+                    <div className="relative flex gap-4 p-4">
+                      <div className="flex flex-col items-center justify-start mt-2 relative z-10 w-4">
+                        <div className="w-4 h-4 rounded-sm bg-foreground/10 flex items-center justify-center border border-foreground/20 shrink-0">
+                          <div className="w-[5px] h-[5px] rounded-sm bg-foreground/70" />
+                        </div>
+                      </div>
+                      <div className="flex-1 relative">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Destination</label>
+                        <input
+                          type="text"
+                          placeholder="Où l'envoyer ?"
+                          value={form.deliveryAddress}
+                          onChange={e => handleSearch(e.target.value, 'deliveryAddress')}
+                          onFocus={() => setActiveField('deliveryAddress')}
+                          className="w-full bg-transparent text-foreground text-[13px] font-bold placeholder:text-muted-foreground/40 outline-none pb-1"
+                        />
+                        {form.deliveryAddress && (
+                          <button onClick={() => { update('deliveryAddress', ''); setDestinationCoords(null); setSuggestions([]); }} className="absolute right-0 bottom-1 p-1 text-muted-foreground hover:text-foreground transition-colors">
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
 
-                 <div className="relative flex gap-4 p-4">
-                   <div className="flex flex-col items-center justify-start mt-2 relative z-10 w-4">
-                     <div className="w-4 h-4 rounded-sm bg-foreground/10 flex items-center justify-center border border-foreground/20 shrink-0">
-                       <div className="w-[5px] h-[5px] rounded-sm bg-foreground/70" />
-                     </div>
-                   </div>
-                   <div className="flex-1 relative">
-                     <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Destination</label>
-                     <input
-                       type="text"
-                       placeholder="Où l'envoyer ?"
-                       value={form.deliveryAddress}
-                       onChange={e => handleSearch(e.target.value, 'deliveryAddress')}
-                       onFocus={() => setActiveField('deliveryAddress')}
-                       className="w-full bg-transparent text-foreground text-[13px] font-bold placeholder:text-muted-foreground/40 outline-none pb-1"
-                     />
-                     {form.deliveryAddress && (
-                       <button onClick={() => { update('deliveryAddress', ''); setDestinationCoords(null); setSuggestions([]); }} className="absolute right-0 bottom-1 p-1 text-muted-foreground hover:text-foreground transition-colors">
-                         <X className="w-3.5 h-3.5" />
-                       </button>
-                     )}
-                     
-                     <AnimatePresence>
-                       {activeField === 'deliveryAddress' && (suggestions.length > 0 || loadingSearch) && (
-                         <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute left-0 right-0 top-full mt-3 bg-card/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-y-auto max-h-[220px] z-[1000] ring-1 ring-black/50">
-                           {loadingSearch ? <div className="p-5 flex justify-center"><Loader2 className="w-4 h-4 animate-spin text-accent" /></div> : suggestions.map((s, idx) => (
-                             <button key={idx} onMouseDown={(e) => { e.preventDefault(); selectSuggestion(s); }} className="w-full p-4 flex items-start gap-3 hover:bg-white/5 transition-colors border-b border-white/5 text-left active:bg-white/10">
-                               <MapPin className="w-4 h-4 text-foreground/50 shrink-0 mt-0.5" />
-                               <span className="text-[11px] font-bold text-foreground leading-snug">{s.displayName}</span>
-                             </button>
-                           ))}
-                         </motion.div>
-                       )}
-                     </AnimatePresence>
-                   </div>
+                    {/* Global Search Suggestions Overlay */}
+                    <AnimatePresence>
+                      {activeField && (suggestions.length > 0 || loadingSearch) && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: -10 }} 
+                          animate={{ opacity: 1, y: 0 }} 
+                          exit={{ opacity: 0, y: -10 }} 
+                          className="absolute left-4 right-4 top-[100px] bg-card/95 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-y-auto max-h-[300px] z-[1001] ring-1 ring-black/50"
+                        >
+                          {loadingSearch ? (
+                            <div className="p-8 flex flex-col items-center gap-3">
+                              <Loader2 className="w-6 h-6 animate-spin text-accent" />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Recherche en cours...</span>
+                            </div>
+                          ) : (
+                            <div className="py-2">
+                              {suggestions.map((s, idx) => (
+                                <button 
+                                  key={idx} 
+                                  onMouseDown={(e) => { e.preventDefault(); selectSuggestion(s); }} 
+                                  className="w-full p-4 flex items-start gap-4 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 text-left active:bg-white/10 group"
+                                >
+                                  <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-accent/10 transition-colors">
+                                    <MapPin className={`w-4 h-4 transition-colors ${activeField === 'pickupAddress' ? 'text-accent' : 'text-foreground/40 group-hover:text-accent'}`} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <span className="text-[11px] font-bold text-foreground block truncate">{s.displayName}</span>
+                                    <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tighter">Sénégal</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                  </div>
               </div>
 
