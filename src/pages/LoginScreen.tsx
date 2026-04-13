@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,7 +6,7 @@ import { ArrowLeft, Phone, KeyRound, UserPlus, Car, User as UserIcon } from 'luc
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import * as api from '@/services/api';
-import type { Driver, User } from '@/types';
+import type { Driver, User, UserType } from '@/types';
 
 type Step = 'phone' | 'otp' | 'choose-profile' | 'register';
 type AuthProfileByType = { user: User; driver: Driver };
@@ -14,7 +14,19 @@ type AuthProfileByType = { user: User; driver: Driver };
 const LoginScreen = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { setSession, setProfile } = useAuthStore();
+  const { session, setSession, setProfile } = useAuthStore();
+
+  useEffect(() => {
+    if (session) {
+      const redirectMap: Record<UserType, string> = {
+        user: '/user/dashboard',
+        driver: '/driver/dashboard',
+        'admin-stand': '/admin-stand/dashboard',
+        'super-admin': '/super-admin/dashboard',
+      };
+      navigate(redirectMap[session.userType] || '/services', { replace: true });
+    }
+  }, [session, navigate]);
 
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
@@ -91,13 +103,17 @@ const LoginScreen = () => {
   const goBack = () => {
     if (step === 'otp') setStep('phone');
     else if (step === 'choose-profile' || step === 'register') setStep('otp');
-    else navigate(-1);
+    else if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
   };
 
   return (
     <div className="min-h-screen bg-background safe-top safe-bottom flex flex-col">
       {/* Header */}
-      <div className="flex items-center px-4 pt-4">
+      <div className="flex items-center px-4 pt-4 relative z-10">
         <button onClick={goBack} className="tap-target p-2 rounded-xl hover:bg-muted" aria-label={t('common.back')}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>

@@ -2,19 +2,34 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '@/store/authStore';
+import type { UserType } from '@/types';
 
 const SplashScreen = () => {
   const [show, setShow] = useState(true);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { session } = useAuthStore();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShow(false);
-      setTimeout(() => navigate('/onboarding'), 500);
+      setTimeout(() => {
+        if (session) {
+          const redirectMap: Record<UserType, string> = {
+            user: '/user/dashboard',
+            driver: '/driver/dashboard',
+            'admin-stand': '/admin-stand/dashboard',
+            'super-admin': '/super-admin/dashboard',
+          };
+          navigate(redirectMap[session.userType] || '/services', { replace: true });
+        } else {
+          navigate('/onboarding', { replace: true });
+        }
+      }, 500);
     }, 3500);
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, session]);
 
   return (
     <AnimatePresence>

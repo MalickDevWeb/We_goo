@@ -7,6 +7,7 @@ import * as api from '@/services/api';
 import type { Driver, Ride } from '@/types';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import driverPhoto from '@/assets/driver-roberto.png';
 
 const DriverDashboard = () => {
   const { t } = useTranslation();
@@ -34,6 +35,7 @@ const DriverDashboard = () => {
     await api.updateRide(ride.id, { status: 'accepted', driverId: session.id });
     setAvailableRides(prev => prev.filter(r => r.id !== ride.id));
     toast.success(t('common.success'));
+    navigate('/driver/tracking');
   };
 
   const handleLogout = () => { logout(); navigate('/'); };
@@ -48,7 +50,12 @@ const DriverDashboard = () => {
   return (
     <div className="min-h-screen bg-background safe-top safe-bottom px-6">
       <div className="pt-6 pb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-foreground">{t('driver.dashboard.title')}</h1>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full border-2 border-accent overflow-hidden bg-accent/20">
+            <img src={driverPhoto} alt="Profile" className="w-full h-full object-cover" />
+          </div>
+          <h1 className="text-xl font-bold text-foreground">{t('driver.dashboard.title')}</h1>
+        </div>
         <button onClick={handleLogout} className="text-sm text-muted-foreground tap-target">{t('common.logout')}</button>
       </div>
 
@@ -115,10 +122,10 @@ const DriverDashboard = () => {
               <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-accent">${ride.amount}</span>
                 <div className="flex gap-2">
-                  <button onClick={() => acceptRide(ride)} className="w-10 h-10 rounded-full bg-accent2/20 flex items-center justify-center tap-target">
+                  <button onClick={() => acceptRide(ride)} className="w-10 h-10 rounded-full bg-accent2/20 flex items-center justify-center tap-target" aria-label={t('common.accept')}>
                     <Check className="w-5 h-5 text-accent2" />
                   </button>
-                  <button className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center tap-target">
+                  <button className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center tap-target" aria-label={t('common.cancel')}>
                     <X className="w-5 h-5 text-destructive" />
                   </button>
                 </div>

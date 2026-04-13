@@ -2,13 +2,28 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { servicesCatalog, type ServiceKey } from '@/lib/servicesCatalog';
+import { useAuthStore } from '@/store/authStore';
+import type { UserType } from '@/types';
 
 const ServicesScreen = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState<ServiceKey>('rides');
+  const { session } = useAuthStore();
+
+  useEffect(() => {
+    if (session) {
+      const redirectMap: Record<UserType, string> = {
+        user: '/user/dashboard',
+        driver: '/driver/dashboard',
+        'admin-stand': '/admin-stand/dashboard',
+        'super-admin': '/super-admin/dashboard',
+      };
+      navigate(redirectMap[session.userType] || '/services', { replace: true });
+    }
+  }, [session, navigate]);
 
   const visibleServices = useMemo(() => {
     const index = Math.max(0, servicesCatalog.findIndex((s) => s.key === activeKey));

@@ -16,6 +16,18 @@ export const pickupIcon = createIcon(markerPickupImg, [36, 36]);
 export const destinationIcon = createIcon(markerDestImg, [36, 36]);
 export const packageIcon = createIcon(markerPackageImg, [44, 44]);
 
+export const createPhotoIcon = (photoUrl: string) => {
+  return L.divIcon({
+    html: `<div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 3px solid #e62057; box-shadow: 0 10px 20px rgba(230,32,87,0.4), 0 0 0 3px rgba(230,32,87,0.2); background: #000; display: flex; align-items: center; justify-content: center; position: relative;">
+             <img src="${photoUrl}" style="width: 100%; height: 100%; object-fit: cover;" />
+             <div style="position: absolute; inset: 0; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); pointer-events: none; border-radius: 50%;"></div>
+           </div>`,
+    className: 'custom-photo-marker transition-all duration-300', 
+    iconSize: [48, 48],
+    iconAnchor: [24, 24]
+  });
+};
+
 // Internal component to handle map events
 const MapEvents = ({ onClick }: { onClick?: (lat: number, lng: number) => void }) => {
   useMapEvents({
@@ -23,6 +35,17 @@ const MapEvents = ({ onClick }: { onClick?: (lat: number, lng: number) => void }
       if (onClick) onClick(e.latlng.lat, e.latlng.lng);
     },
   });
+  return null;
+};
+
+// Auto-center helper
+const AutoCenter = ({ center, zoom }: { center?: [number, number], zoom?: number }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.setView(center, zoom || map.getZoom(), { animate: true });
+    }
+  }, [center, zoom, map]);
   return null;
 };
 
@@ -42,8 +65,10 @@ const FitBounds = ({ positions }: { positions: [number, number][] }) => {
 
 export interface MapMarker {
   position: [number, number];
-  icon: L.Icon;
+  icon: L.Icon | L.DivIcon;
   key: string;
+  rotation?: number;
+  onClick?: () => void;
 }
 
 interface WegoMapProps {
@@ -88,15 +113,29 @@ const WegoMap = ({
         attributionControl={false}
       >
         <TileLayer
-          url={variant === 'dark' 
-            ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          }
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
         <MapEvents onClick={onMapClick} />
-        {allPositions.length > 0 && <FitBounds positions={allPositions} />}
+        {!center && allPositions.length > 0 && <FitBounds positions={allPositions} />}
+        {center && <AutoCenter center={center} zoom={zoom} />}
         {markers.map(m => (
-          <Marker key={m.key} position={m.position} icon={m.icon} />
+          <Marker 
+            key={m.key} 
+            position={m.position} 
+            icon={m.icon}
+            eventHandlers={{
+              click: () => {
+                if (m.onClick) m.onClick();
+              },
+              add: (e) => {
+                if (m.rotation !== undefined) {
+                  const el = e.target.getElement();
+                  if (el) el.style.transform += ` rotate(${m.rotation}deg)`;
+                }
+              }
+            }}
+          />
         ))}
         {routePoints && routePoints.length >= 2 && (
           <Polyline

@@ -14,12 +14,12 @@ export type ServiceItem = {
 export const servicesCatalog: ServiceItem[] = [
   { key: 'rides', icon: Car, available: true, imageSrc: '/images/photos/location_voiture.png' },
   { key: 'packages', icon: Package, available: true, imageSrc: '/images/photos/colis.png' },
-  { key: 'rental', icon: CarFront, available: false, flag: 'version2_vehicle_rental', imageSrc: '/images/photos/location_voiture_avec_cle.png' },
-  { key: 'commerce', icon: ShoppingBag, available: false, flag: 'version2_commerce', imageSrc: '/images/photos/achats_robe.png' },
+  { key: 'rental', icon: CarFront, available: true, flag: 'version2_vehicle_rental', imageSrc: '/images/photos/location_voiture_avec_cle.png' },
+  { key: 'commerce', icon: ShoppingBag, available: true, flag: 'version2_commerce', imageSrc: '/images/photos/achats_robe.png' },
   {
     key: 'restaurants',
     icon: UtensilsCrossed,
-    available: false,
+    available: true,
     flag: 'version2_restaurants',
     imageSrc: '/images/photos/achat_restaurant.png',
   },

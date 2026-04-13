@@ -1,16 +1,49 @@
 import { servicesCatalog, getServiceByKey, isServiceKey } from '@/lib/servicesCatalog';
-import { ArrowLeft, ArrowRight, MapPin, Package, Car, ShoppingBag, Utensils, Hotel, Clock, Shield, Zap, Navigation, Calendar } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, Package, Car, ShoppingBag, Utensils, Hotel, Clock, Shield, Zap, Navigation, Calendar, Users, Truck } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 
 const ServiceDetailsScreen = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { serviceKey } = useParams();
+  const { session } = useAuthStore();
 
   const service = useMemo(() => getServiceByKey(serviceKey), [serviceKey]);
   const safeKey = isServiceKey(serviceKey ?? '') ? serviceKey : servicesCatalog[0].key;
+
+  const handleActionClick = (overrideKey?: string | React.MouseEvent, type?: string) => {
+    // If the first argument is an event, we ignore it to prevent string mismatch.
+    const keyStr = typeof overrideKey === 'string' ? overrideKey : safeKey;
+    if (!session) {
+      navigate('/login');
+      return;
+    }
+    const urlParams = type ? `?type=${type}` : '';
+    switch (keyStr) {
+      case 'rides':
+        navigate(`/user/booking${urlParams}`);
+        break;
+      case 'commerce':
+        navigate(`/user/commerce${urlParams}`);
+        break;
+      case 'packages':
+        navigate(`/user/package${urlParams}`);
+        break;
+      case 'restaurants':
+        navigate(`/user/restaurants${urlParams}`);
+        break;
+      case 'rental':
+        navigate(`/user/rental${urlParams}`);
+        break;
+      default:
+        // fallback pour les services pas encore construits
+        navigate(`/user/dashboard${urlParams}`);
+        break;
+    }
+  };
 
   if (!service) {
     return (
@@ -117,17 +150,31 @@ const ServiceDetailsScreen = () => {
             </div>
             <button
               type="button"
-              onClick={() => navigate('/login')}
-              className="w-full p-4 rounded-2xl bg-gradient-to-r from-accent to-accent/80 border border-accent/30 flex items-center gap-4 tap-target shadow-lg shadow-accent/20"
+              onClick={() => handleActionClick('packages', 'standard')}
+              className="w-full p-4 rounded-2xl bg-gradient-to-r from-accent to-accent/80 border border-accent/30 flex items-center gap-4 tap-target shadow-lg shadow-accent/20 mb-3"
             >
-              <div className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center shrink-0">
                 <Package className="w-6 h-6 text-accent" />
               </div>
-              <div className="text-left">
-                <div className="text-base font-bold text-white">Envoyer un colis</div>
-                <div className="text-xs text-white/70">Livraison rapide & sécurisée</div>
+              <div className="text-left min-w-0">
+                <div className="text-base font-bold text-white truncate">Envoyer un colis (Privé)</div>
+                <div className="text-xs text-white/70 line-clamp-1">De particulier à particulier</div>
               </div>
-              <ArrowRight className="w-5 h-5 text-white ml-auto" />
+              <ArrowRight className="w-5 h-5 text-white shrink-0 ml-auto" />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleActionClick('packages', 'collection')}
+              className="w-full p-4 rounded-2xl bg-card border border-border/40 flex items-center gap-4 tap-target mb-3"
+            >
+              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+                <Truck className="w-6 h-6 text-accent" />
+              </div>
+              <div className="text-left min-w-0">
+                <div className="text-base font-bold text-foreground truncate">Organiser une collecte</div>
+                <div className="text-xs text-muted-foreground line-clamp-1">Pour marchands et entreprises</div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-muted-foreground shrink-0 ml-auto" />
             </button>
             <div className="flex gap-2">
               <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
@@ -161,28 +208,42 @@ const ServiceDetailsScreen = () => {
             </div>
             <button
               type="button"
-              onClick={() => navigate('/login')}
-              className="w-full p-4 rounded-2xl bg-gradient-to-r from-accent to-accent/80 border border-accent/30 flex items-center gap-4 tap-target shadow-lg shadow-accent/20"
+              onClick={() => handleActionClick('rides', 'private')}
+              className="w-full p-4 rounded-2xl bg-gradient-to-r from-accent to-accent/80 border border-accent/30 flex items-center gap-4 tap-target shadow-lg shadow-accent/20 mb-3"
             >
-              <div className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center shrink-0">
                 <Car className="w-6 h-6 text-accent" />
               </div>
-              <div className="text-left">
-                <div className="text-base font-bold text-white">Commander un trajet</div>
-                <div className="text-xs text-white/70">Rapide & confortable</div>
+              <div className="text-left min-w-0">
+                <div className="text-base font-bold text-white truncate">Taxi Privé</div>
+                <div className="text-xs text-white/70 line-clamp-1">Rapide & exclusif</div>
               </div>
-              <ArrowRight className="w-5 h-5 text-white ml-auto" />
+              <ArrowRight className="w-5 h-5 text-white shrink-0 ml-auto" />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleActionClick('rides', 'shared')}
+              className="w-full p-4 rounded-2xl bg-card border border-border/40 flex items-center gap-4 tap-target mb-3"
+            >
+              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+                <Users className="w-6 h-6 text-accent" />
+              </div>
+              <div className="text-left min-w-0">
+                <div className="text-base font-bold text-foreground truncate">Taxi Partagé</div>
+                <div className="text-xs text-muted-foreground line-clamp-1">Économique & convivial</div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-muted-foreground shrink-0 ml-auto" />
             </button>
             <div className="grid grid-cols-3 gap-2">
-              <button onClick={() => navigate('/login')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
+              <button onClick={() => handleActionClick('rides', 'private')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
                 <Car className="w-5 h-5 text-accent" />
                 <span className="text-xs text-muted-foreground">Standard</span>
               </button>
-              <button onClick={() => navigate('/login')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
+              <button onClick={() => handleActionClick('rides', 'private')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
                 <Car className="w-5 h-5 text-accent" />
                 <span className="text-xs text-muted-foreground">Premium</span>
               </button>
-              <button onClick={() => navigate('/login')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
+              <button onClick={() => handleActionClick('rides', 'private')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
                 <Car className="w-5 h-5 text-accent" />
                 <span className="text-xs text-muted-foreground">Van</span>
               </button>
@@ -228,7 +289,7 @@ const ServiceDetailsScreen = () => {
             </div>
             <button
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => handleActionClick('rental')}
               className="w-full p-4 rounded-2xl bg-gradient-to-r from-accent to-accent/80 border border-accent/30 flex items-center gap-4 tap-target shadow-lg shadow-accent/20"
             >
               <div className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center">
@@ -259,6 +320,27 @@ const ServiceDetailsScreen = () => {
                 <span>Livraison rapide</span>
               </div>
             </div>
+            <div className="text-sm font-medium text-foreground pt-4">Catégories</div>
+            <div className="-mx-6 px-6 overflow-x-auto no-scrollbar">
+              <div className="flex gap-2 pb-6">
+                {[
+                  { name: 'Voiture', icon: '🚗' },
+                  { name: 'Moto', icon: '🏍️' },
+                  { name: 'Camion', icon: '🚛' },
+                  { name: 'Vélo', icon: '🚲' },
+                  { name: 'Engin', icon: '🚜' },
+                ].map((cat) => (
+                  <button
+                    key={cat.name}
+                    onClick={() => navigate(`/user/rental?category=${cat.name}`)}
+                    className="shrink-0 w-20 p-3 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center gap-2 tap-target active:scale-95 transition-all"
+                  >
+                    <span className="text-2xl">{cat.icon}</span>
+                    <span className="text-[10px] font-black uppercase tracking-tight text-white/40">{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -274,7 +356,7 @@ const ServiceDetailsScreen = () => {
             </div>
             <button
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => handleActionClick('commerce')}
               className="w-full p-4 rounded-2xl bg-gradient-to-r from-accent to-accent/80 border border-accent/30 flex items-center gap-4 tap-target shadow-lg shadow-accent/20"
             >
               <div className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center">
@@ -301,7 +383,7 @@ const ServiceDetailsScreen = () => {
                 ].map((cat) => (
                   <button
                     key={cat.name}
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate(`/user/commerce?category=${cat.name}`)}
                     className="shrink-0 w-20 p-3 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target"
                   >
                     <span className="text-xl">{cat.icon}</span>
@@ -326,7 +408,7 @@ const ServiceDetailsScreen = () => {
             </div>
             <button
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => handleActionClick('restaurants')}
               className="w-full p-4 rounded-2xl bg-gradient-to-r from-accent to-accent/80 border border-accent/30 flex items-center gap-4 tap-target shadow-lg shadow-accent/20"
             >
               <div className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center">
@@ -353,7 +435,7 @@ const ServiceDetailsScreen = () => {
                 ].map((cat) => (
                   <button
                     key={cat.name}
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate(`/user/restaurants?category=${cat.name}`)}
                     className="shrink-0 w-20 p-3 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target"
                   >
                     <span className="text-xl">{cat.icon}</span>
@@ -404,7 +486,7 @@ const ServiceDetailsScreen = () => {
             </div>
             <button
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => handleActionClick('hotels')}
               className="w-full p-4 rounded-2xl bg-gradient-to-r from-accent to-accent/80 border border-accent/30 flex items-center gap-4 tap-target shadow-lg shadow-accent/20"
             >
               <div className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center">

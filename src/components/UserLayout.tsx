@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Home, MapPin, Wallet, Clock, User } from 'lucide-react';
+import { Home, MapPin, Wallet, ClipboardList, User } from 'lucide-react';
 
 const tabs = [
-  { key: 'home', path: '/user/dashboard', icon: Home },
-  { key: 'booking', path: '/user/booking', icon: MapPin },
-  { key: 'wallet', path: '/user/wallet', icon: Wallet },
-  { key: 'history', path: '/user/history', icon: Clock },
-  { key: 'profile', path: '/user/profile', icon: User },
+  { key: 'home',    path: '/user/dashboard', icon: Home          },
+  { key: 'booking', path: '/user/booking',   icon: MapPin        },
+  { key: 'wallet',  path: '/user/wallet',    icon: Wallet        },
+  { key: 'history', path: '/user/history',   icon: ClipboardList },
+  { key: 'profile', path: '/user/profile',   icon: User          },
 ];
 
 const UserLayout = () => {

@@ -9,9 +9,10 @@ interface RequireAuthProps {
 }
 
 const RequireAuth = ({ children, allowedRoles }: RequireAuthProps) => {
-  const { session } = useAuthStore();
+  const { session, profile } = useAuthStore();
 
   if (!session) return <Navigate to="/login" replace />;
+  if (profile?.blocked) return <Navigate to="/blocked" replace />;
   if (!allowedRoles.includes(session.userType)) {
     const redirectMap: Record<UserType, string> = {
       user: '/user/dashboard',

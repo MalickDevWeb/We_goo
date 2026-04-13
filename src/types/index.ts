@@ -51,8 +51,11 @@ export interface Ride {
   status: RideStatus;
   amount: number;
   date: string;
+  pickupCoords?: [number, number];
+  destinationCoords?: [number, number];
   distance?: string;
   vehicleTypeId?: string;
+  durationMin?: number;
   etaMin?: number;
 }
 
@@ -135,4 +138,25 @@ export interface AuthSession {
   userType: UserType;
   id: number;
   phone?: string;
+}
+
+export interface OrderItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  image?: string;
+}
+
+export type OrderStatus = 'pending' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
+
+export interface Order {
+  id: number;
+  userId: number;
+  items: OrderItem[];
+  totalAmount: number;
+  status: OrderStatus;
+  date: string;
+  address: string;
+  category: string;
 }

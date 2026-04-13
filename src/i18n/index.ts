@@ -5,9 +5,9 @@ import fr from './fr';
 
 const savedLang = (() => {
   try {
-    return localStorage.getItem('wego-lang') || 'es';
+    return localStorage.getItem('wego-lang') || 'fr';
   } catch {
-    return 'es';
+    return 'fr';
   }
 })();
 

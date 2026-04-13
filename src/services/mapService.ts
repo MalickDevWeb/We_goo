@@ -37,17 +37,27 @@ export const reverseGeocode = async (lat: number, lon: number): Promise<string> 
   }
 };
 
-export const getRealRoute = async (start: [number, number], end: [number, number]): Promise<[number, number][]> => {
+export interface RouteInfo {
+  coordinates: [number, number][];
+  distance: number; // in km
+  duration: number; // in minutes
+}
 
+export const getRealRoute = async (start: [number, number], end: [number, number]): Promise<RouteInfo> => {
   try {
     const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`);
     const data = await response.json();
     if (data.routes && data.routes.length > 0) {
-      return data.routes[0].geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
+      const route = data.routes[0];
+      return {
+        coordinates: route.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]),
+        distance: route.distance / 1000,
+        duration: route.duration / 60
+      };
     }
-    return [start, end];
+    return { coordinates: [start, end], distance: 0, duration: 0 };
   } catch (error) {
     console.error("Routing error:", error);
-    return [start, end];
+    return { coordinates: [start, end], distance: 0, duration: 0 };
   }
 };

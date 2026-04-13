@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '@/store/authStore';
+import type { UserType } from '@/types';
 
 const slides = [
   { key: 'slide1', imageFile: 'voiture.jpg' },
@@ -13,6 +15,19 @@ const OnboardingScreen = () => {
   const [current, setCurrent] = useState(0);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { session } = useAuthStore();
+
+  useEffect(() => {
+    if (session) {
+      const redirectMap: Record<UserType, string> = {
+        user: '/user/dashboard',
+        driver: '/driver/dashboard',
+        'admin-stand': '/admin-stand/dashboard',
+        'super-admin': '/super-admin/dashboard',
+      };
+      navigate(redirectMap[session.userType] || '/services', { replace: true });
+    }
+  }, [session, navigate]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {

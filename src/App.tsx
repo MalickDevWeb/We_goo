@@ -14,20 +14,28 @@ import ServiceDetailsScreen from "@/pages/ServiceDetailsScreen";
 import LoginScreen from "@/pages/LoginScreen";
 import AdminLoginScreen from "@/pages/AdminLoginScreen";
 import BrandAssets from "@/pages/BrandAssets";
+import BlockedScreen from "@/pages/BlockedScreen";
 
 import UserDashboard from "@/pages/user/UserDashboard";
 import UserBooking from "@/pages/user/UserBooking";
 import UserWallet from "@/pages/user/UserWallet";
 import UserHistory from "@/pages/user/UserHistory";
 import UserProfile from "@/pages/user/UserProfile";
+import UserEditProfile from "@/pages/user/UserEditProfile";
 import UserTracking from "@/pages/user/UserTracking";
 import PackageTracking from "@/pages/user/PackageTracking";
 import UserChat from "@/pages/user/UserChat";
 import UserEmergency from "@/pages/user/UserEmergency";
 import UserPackageSend from "@/pages/user/UserPackageSend";
 import UserLostItem from "@/pages/user/UserLostItem";
+import UserSecurity from "@/pages/user/UserSecurity";
+import UserNotifications from "@/pages/user/UserNotifications";
+import UserCommerce from "@/pages/user/UserCommerce";
+import UserRestaurants from "@/pages/user/UserRestaurants";
+import UserRental from "@/pages/user/UserRental";
 
 import DriverDashboard from "@/pages/driver/DriverDashboard";
+import DriverTracking from "@/pages/driver/DriverTracking";
 import DriverRides from "@/pages/driver/DriverRides";
 import DriverEarnings from "@/pages/driver/DriverEarnings";
 import DriverWallet from "@/pages/driver/DriverWallet";
@@ -53,6 +61,7 @@ const App = () => (
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/admin-login" element={<AdminLoginScreen />} />
           <Route path="/brand-assets" element={<BrandAssets />} />
+          <Route path="/blocked" element={<BlockedScreen />} />
 
           {/* User (with tab layout) */}
           <Route path="/user" element={<RequireAuth allowedRoles={['user']}><UserLayout /></RequireAuth>}>
@@ -61,6 +70,7 @@ const App = () => (
             <Route path="wallet" element={<UserWallet />} />
             <Route path="history" element={<UserHistory />} />
             <Route path="profile" element={<UserProfile />} />
+            <Route path="profile/edit" element={<UserEditProfile />} />
           </Route>
           {/* User stack screens (no tab bar) */}
           <Route path="/user/tracking" element={<RequireAuth allowedRoles={['user']}><UserTracking /></RequireAuth>} />
@@ -69,9 +79,15 @@ const App = () => (
           <Route path="/user/emergency" element={<RequireAuth allowedRoles={['user']}><UserEmergency /></RequireAuth>} />
           <Route path="/user/package" element={<RequireAuth allowedRoles={['user']}><UserPackageSend /></RequireAuth>} />
           <Route path="/user/lost-item" element={<RequireAuth allowedRoles={['user']}><UserLostItem /></RequireAuth>} />
+          <Route path="/user/security" element={<RequireAuth allowedRoles={['user']}><UserSecurity /></RequireAuth>} />
+          <Route path="/user/notifications" element={<RequireAuth allowedRoles={['user']}><UserNotifications /></RequireAuth>} />
+          <Route path="/user/commerce" element={<RequireAuth allowedRoles={['user']}><UserCommerce /></RequireAuth>} />
+          <Route path="/user/restaurants" element={<RequireAuth allowedRoles={['user']}><UserRestaurants /></RequireAuth>} />
+          <Route path="/user/rental" element={<RequireAuth allowedRoles={['user']}><UserRental /></RequireAuth>} />
 
           {/* Driver */}
           <Route path="/driver/dashboard" element={<RequireAuth allowedRoles={['driver']}><DriverDashboard /></RequireAuth>} />
+          <Route path="/driver/tracking" element={<RequireAuth allowedRoles={['driver']}><DriverTracking /></RequireAuth>} />
           <Route path="/driver/rides" element={<RequireAuth allowedRoles={['driver']}><DriverRides /></RequireAuth>} />
           <Route path="/driver/earnings" element={<RequireAuth allowedRoles={['driver']}><DriverEarnings /></RequireAuth>} />
           <Route path="/driver/wallet" element={<RequireAuth allowedRoles={['driver']}><DriverWallet /></RequireAuth>} />
