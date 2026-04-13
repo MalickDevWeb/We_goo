@@ -27,7 +27,7 @@ interface FoodItem {
 
 const MOCK_FOOD: FoodItem[] = [
   { id: 'f1', name: 'Kebab Mixte Royal', price: 4500, rating: 4.8, reviews: 342, image: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&h=400&fit=crop', category: 'Kebab', restaurant: 'Istanbul Grill', prepTime: '15-20 min', isHot: true },
-  { id: 'f2', name: 'Pizza Margherita XL', price: 7500, rating: 4.9, reviews: 521, image: 'https://images.unsplash.com/photo-1574071318508-1cdbad80ad38?w=400&h=400&fit=crop', category: 'Italien', restaurant: 'Mama Pizza', prepTime: '20-30 min' },
+  { id: 'f2', name: 'Pizza Margherita XL', price: 7500, rating: 4.9, reviews: 521, image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=400&fit=crop', category: 'Italien', restaurant: 'Mama Pizza', prepTime: '20-30 min' },
   { id: 'f3', name: 'Tacos 3 Viandes', price: 3500, rating: 4.7, reviews: 890, image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=400&fit=crop', category: 'Mexicain', restaurant: 'O\'Tacos Dakar', prepTime: '10-15 min', isHot: true },
   { id: 'f4', name: 'Sushi Party Box', price: 18000, rating: 5.0, reviews: 124, image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&h=400&fit=crop', category: 'Asiatique', restaurant: 'Wasabi Zen', prepTime: '25-35 min' },
   { id: 'f5', name: 'Butter Chicken', price: 6500, rating: 4.8, reviews: 215, image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=400&fit=crop', category: 'Indien', restaurant: 'Le Taj Mahal', prepTime: '20-30 min', isHot: true },
@@ -37,14 +37,14 @@ const MOCK_FOOD: FoodItem[] = [
 ];
 
 const CATEGORIES = [
-  { id: 'all', name: 'Tous', icon: Utensils },
-  { id: 'burger', name: 'Burger', icon: Flame },
-  { id: 'pizza', name: 'Pizza', icon: Flame },
-  { id: 'asiatique', name: 'Asiatique', icon: Flame },
-  { id: 'indien', name: 'Indien', icon: Flame },
-  { id: 'kebab', name: 'Kebab', icon: Flame },
-  { id: 'italien', name: 'Italien', icon: Flame },
-  { id: 'mexicain', name: 'Mexicain', icon: Flame },
+  { id: 'all', name: 'Tous', image: '/images/products/all_food_banner.png' },
+  { id: 'burger', name: 'Burger', image: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=400&fit=crop' },
+  { id: 'pizza', name: 'Pizza', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=400&fit=crop' },
+  { id: 'asiatique', name: 'Asiatique', image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&h=400&fit=crop' },
+  { id: 'indien', name: 'Indien', image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=400&fit=crop' },
+  { id: 'kebab', name: 'Kebab', image: 'https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&h=400&fit=crop' },
+  { id: 'italien', name: 'Italien', image: 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=400&h=400&fit=crop' },
+  { id: 'mexicain', name: 'Mexicain', image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=400&fit=crop' },
 ];
 
 const UserRestaurants = () => {
@@ -165,6 +165,7 @@ const UserRestaurants = () => {
         setCart([]);
         toast.success("Commande passée ! Le chef prépare votre repas.");
       } catch (err) {
+        console.error("Restaurant Payment Error:", err);
         toast.error("Une erreur est survenue lors du paiement.");
         setCheckoutStep('payment');
       }
@@ -180,7 +181,7 @@ const UserRestaurants = () => {
       {/* Header */}
       <header className="px-6 py-6 flex items-center justify-between sticky top-0 bg-[#0A0A0B]/80 backdrop-blur-xl z-[100]">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} aria-label="Retour" className="w-10 h-10 rounded-2xl glass flex items-center justify-center active:scale-90 transition-all"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={() => navigate('/services')} aria-label="Retour" className="w-10 h-10 rounded-2xl glass flex items-center justify-center active:scale-90 transition-all"><ArrowLeft className="w-5 h-5" /></button>
           <div>
             <h1 className="text-xl font-black tracking-tight uppercase">Restau</h1>
             <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-60">Wego Food</p>
@@ -188,7 +189,7 @@ const UserRestaurants = () => {
         </div>
         
         <div className="flex items-center gap-3">
-          <button aria-label="Notifications" className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all">
+          <button onClick={() => navigate('/user/notifications')} aria-label="Notifications" className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all">
             <Bell className="w-5 h-5 text-white/70" />
             <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent animate-pulse" />
           </button>
@@ -215,7 +216,6 @@ const UserRestaurants = () => {
           <h2 className="text-sm font-black uppercase tracking-widest text-white/40">Catégories</h2>
           <div className="flex gap-4 overflow-x-auto no-scrollbar py-2 -mx-6 px-6">
             {CATEGORIES.map((cat) => {
-              const Icon = cat.icon;
               const isSelected = selectedCategory === cat.name.toLowerCase() || (cat.id === 'all' && selectedCategory === 'all');
               return (
                 <button
@@ -223,10 +223,11 @@ const UserRestaurants = () => {
                   onClick={() => setSelectedCategory(cat.id === 'all' ? 'all' : cat.name.toLowerCase())}
                   className="flex flex-col items-center gap-2 shrink-0"
                 >
-                  <div className={`w-16 h-16 rounded-[22px] flex items-center justify-center border transition-all duration-300 ${
-                    isSelected ? 'bg-accent border-accent shadow-lg scale-105' : 'bg-[#151516] border-white/5'
+                  <div className={`w-20 h-20 rounded-[28px] overflow-hidden border transition-all duration-300 relative ${
+                    isSelected ? 'border-accent shadow-lg shadow-accent/20 scale-105' : 'border-white/5 opacity-60'
                   }`}>
-                    <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-white/40'}`} />
+                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                    {isSelected && <div className="absolute inset-0 bg-accent/20 flex items-center justify-center"><div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center shadow-lg"><CheckCircle2 className="w-3 h-3 text-white" /></div></div>}
                   </div>
                   <span className={`text-[11px] font-black tracking-tight ${isSelected ? 'text-white' : 'text-white/30'}`}>{cat.name}</span>
                 </button>
@@ -250,7 +251,7 @@ const UserRestaurants = () => {
                         <span className="text-[9px] font-black text-white uppercase">Chaud</span>
                       </div>
                     )}
-                    <button aria-label="Ajouter aux favoris" className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60"><Heart className="w-4 h-4" /></button>
+                    <button aria-label="Ajouter aux favoris" title="Ajouter aux favoris" className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60"><Heart className="w-4 h-4" /></button>
                   </div>
                   <div className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
@@ -261,7 +262,7 @@ const UserRestaurants = () => {
                     <p className="text-[9px] font-black text-accent uppercase tracking-widest">{p.restaurant}</p>
                     <div className="flex items-center justify-between pt-1">
                       <span className="text-sm font-black text-white">{p.price.toLocaleString()} CFA</span>
-                      <button onClick={(e) => handleAddToCart(e, p)} aria-label="Ajouter au panier" className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white active:scale-90 transition-all"><Plus className="w-4 h-4" /></button>
+                      <button onClick={(e) => handleAddToCart(e, p)} aria-label="Ajouter au panier" title="Ajouter au panier" className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white active:scale-90 transition-all"><Plus className="w-4 h-4" /></button>
                     </div>
                   </div>
                 </motion.div>
@@ -280,20 +281,20 @@ const UserRestaurants = () => {
               {checkoutStep === 'idle' ? (
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setIsCartOpen(false)} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white active:scale-95 transition-all"><ArrowLeft className="w-5 h-5"/></button>
+                    <button onClick={() => setIsCartOpen(false)} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white active:scale-95 transition-all"><ArrowLeft className="w-5 h-5"/></button>
                     <h2 className="text-2xl font-black text-white">Ma Commande</h2>
                   </div>
                   <div className="space-y-4 max-h-[35vh] overflow-y-auto pr-2 no-scrollbar">
                     {cart.map(item => (
                       <div key={item.product.id} className="flex gap-4 p-4 rounded-3xl bg-white/5 border border-white/5">
-                        <img src={item.product.image} className="w-16 h-16 rounded-2xl object-cover" />
+                        <img src={item.product.image} alt={item.product.name} title={item.product.name} className="w-16 h-16 rounded-2xl object-cover" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-bold text-white truncate">{item.product.name}</p>
                           <p className="text-[10px] text-accent font-bold mb-2">{item.product.restaurant}</p>
                           <div className="flex items-center gap-3">
-                            <button onClick={() => updateQuantity(item.product.id, -1)} className="w-6 h-6 rounded-lg bg-white/5 text-white">-</button>
+                            <button onClick={() => updateQuantity(item.product.id, -1)} aria-label="Réduire" title="Réduire" className="w-6 h-6 rounded-lg bg-white/5 text-white">-</button>
                             <span className="text-xs font-black text-white">{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.product.id, 1)} className="w-6 h-6 rounded-lg bg-white/5 text-white">+</button>
+                            <button onClick={() => updateQuantity(item.product.id, 1)} aria-label="Augmenter" title="Augmenter" className="w-6 h-6 rounded-lg bg-white/5 text-white">+</button>
                           </div>
                         </div>
                         <div className="text-right shrink-0">
@@ -310,16 +311,16 @@ const UserRestaurants = () => {
                 </div>
               ) : checkoutStep === 'address' ? (
                 <div className="space-y-8 animate-in slide-in-from-right duration-300">
-                  <div className="flex items-center gap-4"><button onClick={() => setCheckoutStep('idle')} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button><h2 className="text-2xl font-black text-white">Livraison</h2></div>
+                  <div className="flex items-center gap-4"><button onClick={() => setCheckoutStep('idle')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button><h2 className="text-2xl font-black text-white">Livraison</h2></div>
                   <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
                     <p className="text-[10px] font-black uppercase tracking-widest text-accent">Adresse de réception</p>
-                    <input type="text" value={deliveryAddress} onChange={e => setDeliveryAddress(e.target.value)} className="w-full bg-transparent text-lg font-bold text-white outline-none border-b border-white/10 pb-2 focus:border-accent" />
+                    <input type="text" value={deliveryAddress} onChange={e => setDeliveryAddress(e.target.value)} aria-label="Adresse" title="Adresse" placeholder="Adresse" className="w-full bg-transparent text-lg font-bold text-white outline-none border-b border-white/10 pb-2 focus:border-accent" />
                   </div>
                   <button onClick={() => setCheckoutStep('payment')} aria-label="Payer maintenant" className="w-full py-5 rounded-3xl bg-white text-black font-black uppercase tracking-[0.2em] text-xs">Suivant</button>
                 </div>
               ) : checkoutStep === 'payment' || checkoutStep === 'processing' ? (
                 <div className="space-y-10 animate-in slide-in-from-right duration-300">
-                  <div className="flex items-center gap-4"><button onClick={() => setCheckoutStep('address')} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button><h2 className="text-2xl font-black text-white">Paiement</h2></div>
+                  <div className="flex items-center gap-4"><button onClick={() => setCheckoutStep('address')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button><h2 className="text-2xl font-black text-white">Paiement</h2></div>
                   <div className="glass rounded-[32px] p-6 border border-accent/30 bg-gradient-to-br from-accent/10 to-transparent">
                     <p className="text-[10px] font-black text-white/40 uppercase mb-1">Wego Wallet Balance</p>
                     <p className="text-3xl font-black text-white">{(profile?.walletBalance || 0).toLocaleString()} CFA</p>

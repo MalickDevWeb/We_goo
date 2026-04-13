@@ -184,36 +184,38 @@ const UserTracking = () => {
         )}
       </div>
 
-      {/* Back button */}
-      <div className="absolute top-4 left-4 z-[1000] safe-top">
-        <button onClick={() => navigate('/user/dashboard')} className="w-12 h-12 rounded-full glass-strong flex items-center justify-center shadow-2xl border border-white/10 active:scale-90 transition-transform" aria-label={t('common.back')}>
+      {/* Header Row: Back button + Wego wordmark */}
+      <div className="absolute top-0 left-0 right-0 z-[1000] safe-top flex items-center justify-between px-4 pt-4">
+        <button
+          onClick={() => navigate('/user/dashboard')}
+          className="w-12 h-12 rounded-full glass-strong flex items-center justify-center shadow-2xl border border-white/10 active:scale-90 transition-transform"
+          aria-label="Retour"
+          title="Retour"
+        >
           <ArrowLeft className="w-6 h-6 text-foreground" />
         </button>
-      </div>
 
-      {/* Floating Info Cards */}
-      <div className="absolute top-4 right-4 z-[1000] safe-top flex flex-col gap-3 items-end">
-        <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="glass-strong rounded-[24px] p-5 flex flex-col items-center shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-accent/30 bg-background/60 backdrop-blur-2xl">
-           <div className="flex items-center gap-2 mb-4 bg-accent/10 px-3 py-1 rounded-full border border-accent/20">
-             <div className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_10px_rgba(230,32,87,1)]" />
-             <span className="text-[10px] font-black uppercase tracking-widest text-accent">Télémétrie en Direct</span>
-           </div>
-           
-           <div className="flex gap-8">
-             <div className="flex flex-col items-center justify-center">
-                <span className="text-4xl font-black text-foreground tabular-nums drop-shadow-md tracking-tighter">
-                  {Math.ceil(currentEtaMin)}<span className="text-lg text-muted-foreground font-bold ml-0.5">m</span>
-                </span>
-                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Temps Restant</span>
-             </div>
-             <div className="w-px bg-white/10" />
-             <div className="flex flex-col items-center justify-center">
-                <span className="text-4xl font-black text-foreground tabular-nums drop-shadow-md tracking-tighter">
-                  {distanceRemainingLabel}<span className="text-lg text-muted-foreground font-bold ml-0.5">km</span>
-                </span>
-                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Kilométrage Réel</span>
-             </div>
-           </div>
+        {/* Wego Logo centered */}
+        <div className="flex flex-col items-center">
+          <img src="/wego-logo.svg" alt="Wego" className="h-12 w-auto drop-shadow-lg" />
+        </div>
+
+        {/* Time/Distance compact pill */}
+        <motion.div
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="glass-strong rounded-2xl px-4 py-2.5 flex flex-col items-center shadow-lg border border-accent/20 bg-background/70 backdrop-blur-2xl min-w-[90px]"
+        >
+          <div className="flex items-center gap-1 mb-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+            <span className="text-[8px] font-black uppercase tracking-widest text-accent">Live</span>
+          </div>
+          <span className="text-xl font-black text-foreground tabular-nums leading-none">
+            {Math.ceil(currentEtaMin)}<span className="text-xs text-muted-foreground font-bold">m</span>
+          </span>
+          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide">
+            {distanceRemainingLabel} km
+          </span>
         </motion.div>
       </div>
 
@@ -236,17 +238,17 @@ const UserTracking = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className={`w-4 h-4 rounded-full ${progress >= 0.95 ? 'bg-accent2' : 'bg-accent animate-pulse'} shadow-lg`} />
-                <div className={`absolute inset-0 rounded-full ${progress >= 0.95 ? 'bg-accent2' : 'bg-accent'} animate-ping opacity-50`} />
+                <div className={`w-4 h-4 rounded-full bg-accent animate-pulse shadow-lg`} />
+                <div className={`absolute inset-0 rounded-full bg-accent animate-ping opacity-50`} />
               </div>
               <div>
                 <h3 className="text-2xl font-black text-foreground leading-tight tracking-tight">{statusText}</h3>
                 <p className="text-sm text-accent font-bold uppercase tracking-tighter shrink-0">{progress >= 0.95 ? 'Le chauffeur est arrivé !' : 'Votre taxi est en route'}</p>
               </div>
             </div>
-            <div className="bg-accent2/10 px-3 py-1.5 rounded-full flex items-center gap-2 border border-accent2/20">
-              <ShieldCheck className="w-4 h-4 text-accent2" />
-              <span className="text-[10px] font-black text-accent2 uppercase tracking-tight">Trajet Sécurisé</span>
+            <div className="bg-accent/10 px-3 py-1.5 rounded-full flex items-center gap-2 border border-accent/20">
+              <ShieldCheck className="w-4 h-4 text-accent" />
+              <span className="text-[10px] font-black text-accent uppercase tracking-tight">Trajet Sécurisé</span>
             </div>
           </div>
 
@@ -259,7 +261,7 @@ const UserTracking = () => {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-[28px] p-5 flex items-center gap-5 border border-white/10 shadow-xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110" />
               <div 
-                className="w-16 h-16 rounded-full bg-gradient-to-tr from-accent to-accent2 p-1 shrink-0 cursor-pointer active:scale-95 transition-transform"
+                className="w-16 h-16 rounded-full bg-gradient-to-tr from-accent to-accent/60 p-1 shrink-0 cursor-pointer active:scale-95 transition-transform"
                 onClick={() => setShowPhotoModal(true)}
               >
                  <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center border-2 border-background overflow-hidden">
@@ -291,8 +293,8 @@ const UserTracking = () => {
               Appeler
             </button>
             <button onClick={handleWhatsApp} className="py-5 rounded-2xl glass border border-white/10 text-foreground font-black text-sm flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg hover:bg-white/5">
-              <div className="p-2 bg-accent2/20 rounded-xl">
-                <MessageCircle className="w-5 h-5 text-accent2" />
+              <div className="p-2 bg-accent/20 rounded-xl">
+                <MessageCircle className="w-5 h-5 text-accent" />
               </div>
               Message
             </button>

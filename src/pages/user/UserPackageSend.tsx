@@ -255,6 +255,9 @@ const UserPackageSend = () => {
                         type={field.type}
                         value={form[field.key as keyof typeof form]}
                         onChange={e => update(field.key, e.target.value)}
+                        aria-label={field.label}
+                        title={field.label}
+                        placeholder={field.label}
                         className="w-full py-4 px-5 rounded-[24px] bg-secondary/50 border border-white/5 text-foreground placeholder:text-muted-foreground/30 outline-none focus:ring-2 focus:ring-accent focus:bg-white/5 transition-all shadow-inner font-semibold text-[13px]"
                       />
                     </motion.div>

@@ -28,9 +28,9 @@ interface Product {
 const MOCK_PRODUCTS: Product[] = [
   { id: '1', name: 'Pack Fruits Exotiques', price: 15000, rating: 4.8, reviews: 124, image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&h=400&fit=crop', category: 'Aliment.', seller: 'Dakar Market' },
   { id: '2', name: 'Sneakers Wego Limited', price: 45000, rating: 4.9, reviews: 89, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop', category: 'Vêtements', seller: 'Street Wear SN', isPopular: true },
-  { id: '3', name: 'iPhone 15 Pro Max', price: 850000, rating: 5.0, reviews: 245, image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=400&h=400&fit=crop', category: 'Electronique', seller: 'iStore Dakar' },
+  { id: '3', name: 'iPhone 15 Pro Max', price: 850000, rating: 5.0, reviews: 245, image: '/images/products/iphone_15_pro.png', category: 'Electronique', seller: 'iStore Dakar' },
   { id: '4', name: 'Fauteuil Design Nordique', price: 120000, rating: 4.7, reviews: 56, image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400&h=400&fit=crop', category: 'Maison', seller: 'Home Design' },
-  { id: '5', name: 'Kit Beauté Organique', price: 12500, rating: 4.6, reviews: 78, image: 'https://images.unsplash.com/photo-1596462502278-27bfdc4033c8?w=400&h=400&fit=crop', category: 'Beauté', seller: 'Bio Beauty' },
+  { id: '5', name: 'Kit Beauté Organique', price: 12500, rating: 4.6, reviews: 78, image: '/images/products/beauty_kit.png', category: 'Beauté', seller: 'Bio Beauty' },
   { id: '6', name: 'Ballon de Foot Pro', price: 8500, rating: 4.5, reviews: 112, image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop', category: 'Sport', seller: 'Wego Sport' },
   { id: '7', name: 'Casque Gaming Sans Fil', price: 35000, rating: 4.8, reviews: 92, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop', category: 'Electronique', seller: 'Tech Store', isPopular: true },
   { id: '8', name: 'T-shirt Coton Bio', price: 7500, rating: 4.4, reviews: 45, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop', category: 'Vêtements', seller: 'Eco Wear' },
@@ -166,6 +166,7 @@ const UserCommerce = () => {
         setCart([]);
         toast.success("Commande effectuée avec succès !");
       } catch (err) {
+        console.error("Commerce Payment Error:", err);
         toast.error("Une erreur est survenue lors du paiement.");
         setCheckoutStep('payment');
       }
@@ -182,9 +183,10 @@ const UserCommerce = () => {
       <header className="px-6 py-6 flex items-center justify-between sticky top-0 bg-[#0A0A0B]/80 backdrop-blur-xl z-[100]">
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => navigate(-1)} 
+            onClick={() => navigate('/services')} 
             className="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white/5 active:scale-90 transition-all"
             aria-label="Retour"
+            title="Retour"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -196,7 +198,9 @@ const UserCommerce = () => {
         
         <div className="flex items-center gap-3">
           <button 
+            onClick={() => navigate('/user/notifications')}
             aria-label="Notifications" 
+            title="Notifications"
             className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all"
           >
             <Bell className="w-5 h-5 text-white/70" />
@@ -205,6 +209,7 @@ const UserCommerce = () => {
           <button 
             onClick={() => setIsCartOpen(true)}
             aria-label="Panier" 
+            title="Panier"
             className="w-10 h-10 rounded-2xl bg-accent text-white flex items-center justify-center relative shadow-lg shadow-accent/30 active:scale-95 transition-all"
           >
             <ShoppingCart className="w-5 h-5" />
@@ -325,7 +330,7 @@ const UserCommerce = () => {
                   <div className="relative h-[160px] overflow-hidden">
                     <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute top-3 right-3">
-                      <button aria-label="Favoris" className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60">
+                      <button aria-label="Favoris" title="Favoris" className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60">
                         <Heart className="w-4 h-4" />
                       </button>
                     </div>
@@ -340,6 +345,8 @@ const UserCommerce = () => {
                       <span className="text-sm font-black text-white">{p.price.toLocaleString()} CFA</span>
                       <button 
                         onClick={(e) => handleAddToCart(e, p)}
+                        aria-label="Ajouter au panier"
+                        title="Ajouter au panier"
                         className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white active:scale-90 transition-all"
                       >
                         <ShoppingCart className="w-4 h-4" />
@@ -377,18 +384,18 @@ const UserCommerce = () => {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-black text-white">Mon Panier</h2>
-                    <button onClick={() => setIsCartOpen(false)} aria-label="Fermer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/40"><X className="w-5 h-5"/></button>
+                    <button onClick={() => setIsCartOpen(false)} aria-label="Fermer" title="Fermer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/40"><X className="w-5 h-5"/></button>
                   </div>
                   <div className="space-y-4 max-h-[40vh] overflow-y-auto">
                     {cart.map(item => (
                       <div key={item.product.id} className="flex gap-4 p-4 rounded-3xl bg-white/5 border border-white/5">
-                        <img src={item.product.image} className="w-16 h-16 rounded-2xl object-cover" />
+                        <img src={item.product.image} alt={item.product.name} className="w-16 h-16 rounded-2xl object-cover" />
                         <div className="flex-1 flex flex-col justify-between">
                           <p className="text-sm font-bold text-white leading-tight">{item.product.name}</p>
                           <div className="flex items-center gap-3">
-                            <button onClick={() => updateQuantity(item.product.id, -1)} className="w-6 h-6 rounded-lg bg-white/5 text-white">-</button>
+                            <button onClick={() => updateQuantity(item.product.id, -1)} aria-label="Réduire" title="Réduire" className="w-6 h-6 rounded-lg bg-white/5 text-white">-</button>
                             <span className="text-xs font-black text-white">{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.product.id, 1)} className="w-6 h-6 rounded-lg bg-white/5 text-white">+</button>
+                            <button onClick={() => updateQuantity(item.product.id, 1)} aria-label="Augmenter" title="Augmenter" className="w-6 h-6 rounded-lg bg-white/5 text-white">+</button>
                           </div>
                         </div>
                         <div className="text-right">
@@ -406,13 +413,13 @@ const UserCommerce = () => {
               ) : checkoutStep === 'address' ? (
                 <div className="space-y-8 animate-in slide-in-from-right duration-300">
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setCheckoutStep('idle')} aria-label="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button>
+                    <button onClick={() => setCheckoutStep('idle')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button>
                     <h2 className="text-2xl font-black text-white">Livraison</h2>
                   </div>
                   <div className="space-y-6">
                     <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
                       <p className="text-[10px] font-black uppercase tracking-widest text-accent">Adresse</p>
-                      <input type="text" value={deliveryAddress} onChange={e => setDeliveryAddress(e.target.value)} aria-label="Adresse" placeholder="Adresse" className="w-full bg-transparent text-lg font-bold text-white outline-none border-b border-white/10 pb-2 focus:border-accent" />
+                      <input type="text" value={deliveryAddress} onChange={e => setDeliveryAddress(e.target.value)} aria-label="Adresse" title="Adresse" placeholder="Adresse" className="w-full bg-transparent text-lg font-bold text-white outline-none border-b border-white/10 pb-2 focus:border-accent" />
                     </div>
                   </div>
                   <button onClick={() => setCheckoutStep('payment')} className="w-full py-5 rounded-3xl bg-white text-black font-black uppercase tracking-widest text-xs">Suivant</button>
@@ -420,7 +427,7 @@ const UserCommerce = () => {
               ) : checkoutStep === 'payment' || checkoutStep === 'processing' ? (
                 <div className="space-y-10 animate-in slide-in-from-right duration-300">
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setCheckoutStep('address')} aria-label="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button>
+                    <button onClick={() => setCheckoutStep('address')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button>
                     <h2 className="text-2xl font-black text-white">Paiement</h2>
                   </div>
                   <div className="glass rounded-[32px] p-6 border border-accent/30 bg-gradient-to-br from-accent/10 to-transparent">

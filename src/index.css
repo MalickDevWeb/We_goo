@@ -75,15 +75,15 @@
 @layer utilities {
   .glass {
     background: hsl(var(--glass-bg) / 0.6);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid hsl(var(--glass-border) / 0.3);
   }
 
   .glass-strong {
     background: hsl(var(--glass-bg) / 0.8);
-    backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(30px);
     border: 1px solid hsl(var(--glass-border) / 0.4);
   }
 
@@ -126,5 +126,13 @@
   .antialiased {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }

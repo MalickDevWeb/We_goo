@@ -36,11 +36,11 @@ const MOCK_FLEET: Vehicle[] = [
 ];
 
 const CATEGORIES = [
-  { id: 'all', name: 'Tous', icon: CarFront },
-  { id: 'voiture', name: 'Voiture', icon: CarFront },
-  { id: 'moto', name: 'Moto', icon: CarFront },
-  { id: 'camion', name: 'Camion', icon: CarFront },
-  { id: 'engin', name: 'Engin', icon: CarFront },
+  { id: 'all', name: 'Tous', image: 'https://images.unsplash.com/photo-1493238544526-03e30e703f1e?w=400&h=400&fit=crop' },
+  { id: 'voiture', name: 'Voiture', image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400&h=400&fit=crop' },
+  { id: 'moto', name: 'Moto', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=400&h=400&fit=crop' },
+  { id: 'camion', name: 'Camion', image: 'https://images.unsplash.com/photo-1586191582151-f73972d10c57?w=400&h=400&fit=crop' },
+  { id: 'engin', name: 'Engin', image: 'https://images.unsplash.com/photo-1579616710927-46487e289053?w=400&h=400&fit=crop' },
 ];
 
 const UserRental = () => {
@@ -151,13 +151,13 @@ const UserRental = () => {
       {/* Header */}
       <header className="px-6 py-6 flex items-center justify-between sticky top-0 bg-[#0A0A0B]/80 backdrop-blur-xl z-[100]">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} aria-label="Retour" className="w-10 h-10 rounded-2xl glass flex items-center justify-center active:scale-90 transition-all"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={() => navigate('/services')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-2xl glass flex items-center justify-center active:scale-90 transition-all"><ArrowLeft className="w-5 h-5" /></button>
           <div>
             <h1 className="text-xl font-black tracking-tight uppercase">Location</h1>
             <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-60">Wego Fleet</p>
           </div>
         </div>
-        <button aria-label="Notifications" className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all">
+        <button onClick={() => navigate('/user/notifications')} aria-label="Notifications" title="Notifications" className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all">
           <Bell className="w-5 h-5 text-white/70" />
           <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent" />
         </button>
@@ -177,7 +177,6 @@ const UserRental = () => {
           </div>
           <div className="flex gap-4 overflow-x-auto no-scrollbar py-2 -mx-6 px-6">
             {CATEGORIES.map((cat) => {
-              const Icon = cat.icon;
               const isSelected = selectedCategory === cat.id || (cat.id === 'all' && selectedCategory === 'all');
               return (
                 <button
@@ -185,10 +184,11 @@ const UserRental = () => {
                   onClick={() => setSelectedCategory(cat.id)}
                   className="flex flex-col items-center gap-2 shrink-0"
                 >
-                  <div className={`w-16 h-16 rounded-[22px] flex items-center justify-center border transition-all duration-300 ${
-                    isSelected ? 'bg-accent border-accent shadow-lg scale-105' : 'bg-[#151516] border-white/5'
+                  <div className={`w-20 h-20 rounded-[28px] overflow-hidden border transition-all duration-300 relative ${
+                    isSelected ? 'border-accent shadow-lg shadow-accent/20 scale-105' : 'border-white/5 opacity-60'
                   }`}>
-                    <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-white/40'}`} />
+                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                    {isSelected && <div className="absolute inset-0 bg-accent/20 flex items-center justify-center"><div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center shadow-lg"><CheckCircle2 className="w-3 h-3 text-white" /></div></div>}
                   </div>
                   <span className={`text-[11px] font-black tracking-tight ${isSelected ? 'text-white' : 'text-white/30'}`}>{cat.name}</span>
                 </button>
@@ -254,7 +254,7 @@ const UserRental = () => {
               {checkoutStep === 'duration' ? (
                 <div className="space-y-8">
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setCheckoutStep('idle')} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white active:scale-95 transition-all"><ArrowLeft className="w-5 h-5"/></button>
+                    <button onClick={() => setCheckoutStep('idle')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white active:scale-95 transition-all"><ArrowLeft className="w-5 h-5"/></button>
                     <h2 className="text-2xl font-black text-white">Durée de location</h2>
                   </div>
                   
@@ -264,8 +264,8 @@ const UserRental = () => {
                       <p className="text-2xl font-black text-white">{bookingDays} Jours</p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <button onClick={() => setBookingDays(Math.max(1, bookingDays - 1))} aria-label="Moins de jours" className="w-12 h-12 rounded-2xl bg-white/5 text-white flex items-center justify-center text-xl font-black active:scale-95 transition-all">-</button>
-                      <button onClick={() => setBookingDays(bookingDays + 1)} aria-label="Plus de jours" className="w-12 h-12 rounded-2xl bg-white/5 text-white flex items-center justify-center text-xl font-black active:scale-95 transition-all">+</button>
+                      <button onClick={() => setBookingDays(Math.max(1, bookingDays - 1))} aria-label="Moins de jours" title="Moins de jours" className="w-12 h-12 rounded-2xl bg-white/5 text-white flex items-center justify-center text-xl font-black active:scale-95 transition-all">-</button>
+                      <button onClick={() => setBookingDays(bookingDays + 1)} aria-label="Plus de jours" title="Plus de jours" className="w-12 h-12 rounded-2xl bg-white/5 text-white flex items-center justify-center text-xl font-black active:scale-95 transition-all">+</button>
                     </div>
                   </div>
 
@@ -279,7 +279,7 @@ const UserRental = () => {
               ) : checkoutStep === 'payment' || checkoutStep === 'processing' ? (
                 <div className="space-y-10 animate-in slide-in-from-right duration-300">
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setCheckoutStep('duration')} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white active:scale-95 transition-all"><ArrowLeft className="w-5 h-5"/></button>
+                    <button onClick={() => setCheckoutStep('duration')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white active:scale-95 transition-all"><ArrowLeft className="w-5 h-5"/></button>
                     <h2 className="text-2xl font-black text-white">Paiement</h2>
                   </div>
                   <div className="glass rounded-[32px] p-6 border border-accent/30 bg-gradient-to-br from-accent/10 to-transparent">

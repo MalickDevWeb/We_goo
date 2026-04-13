@@ -16,7 +16,7 @@ const getStoredDb = () => {
   return null;
 };
 
-const initialDb = getStoredDb() || {
+const defaultDb = {
   users: structuredClone(mockUsers),
   drivers: structuredClone(mockDrivers),
   rides: structuredClone(mockRides),
@@ -32,6 +32,13 @@ const initialDb = getStoredDb() || {
   featureFlags: structuredClone(mockFeatureFlags),
   settings: structuredClone(mockSettings),
 };
+
+const initialDb = (() => {
+  const stored = getStoredDb();
+  if (!stored) return defaultDb;
+  // Deep wrap/merge to ensure all tables exist
+  return { ...defaultDb, ...stored };
+})();
 
 const db = initialDb;
 
