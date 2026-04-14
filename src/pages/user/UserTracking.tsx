@@ -151,7 +151,7 @@ const UserTracking = () => {
   ];
 
   const handleWhatsApp = () => {
-    const message = encodeURIComponent(`Hola ${driverName}, soy su pasajero de Wego.`);
+    const message = encodeURIComponent(`Bonjour ${driverName}, je suis votre passager Wego.`);
     window.open(`https://wa.me/${driverPhone.replace('+', '')}?text=${message}`, '_blank');
   };
 
@@ -286,11 +286,11 @@ const UserTracking = () => {
 
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-4">
-            <button onClick={() => window.location.href = `tel:${driverPhone}`} className="py-5 rounded-2xl glass border border-white/10 text-foreground font-black text-sm flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg hover:bg-white/5">
+            <button onClick={handleWhatsApp} className="py-5 rounded-2xl glass border border-white/10 text-foreground font-black text-sm flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg hover:bg-white/5">
               <div className="p-2 bg-accent/20 rounded-xl">
                 <Phone className="w-5 h-5 text-accent" />
               </div>
-              Appeler
+              WhatsApp
             </button>
             <button onClick={handleWhatsApp} className="py-5 rounded-2xl glass border border-white/10 text-foreground font-black text-sm flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg hover:bg-white/5">
               <div className="p-2 bg-accent/20 rounded-xl">

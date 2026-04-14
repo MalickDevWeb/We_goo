@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { User, LogOut, Globe, Shield, CreditCard, HelpCircle, ChevronRight, Bell } from 'lucide-react';
+import { User, LogOut, Globe, Shield, CreditCard, HelpCircle, ChevronRight, Bell, Store, Car } from 'lucide-react';
 import { changeLanguage } from '@/i18n';
 import i18n from '@/i18n';
 import type { User as UserType } from '@/types';
@@ -129,10 +129,35 @@ const UserProfile = () => {
           </div>
           
           <h1 className="text-2xl font-black text-foreground mb-1 tracking-tight">{user?.name}</h1>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2 mb-6">
             <span className="bg-accent/10 px-3 py-1 rounded-full text-[10px] font-black text-accent uppercase tracking-tighter border border-accent/10">Membre Gold</span>
             <span className="text-xs text-muted-foreground font-bold">{user?.phone}</span>
           </div>
+
+          {/* Business Mode Switcher */}
+          {(user as any)?.userType === 'restaurant' && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate('/partner/restaurant')}
+              className="mx-auto flex items-center gap-3 px-6 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 transition-all hover:bg-amber-500/20 mb-8"
+            >
+              <Store className="w-5 h-5" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Dashboard Restaurant</span>
+            </motion.button>
+          )}
+
+          {(user as any)?.userType === 'driver' && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate('/driver/dashboard')}
+              className="mx-auto flex items-center gap-3 px-6 py-3 rounded-2xl bg-accent2/10 border border-accent2/20 text-accent2 transition-all hover:bg-accent2/20 mb-8"
+            >
+              <Car className="w-5 h-5" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Dashboard Chauffeur</span>
+            </motion.button>
+          )}
         </motion.div>
 
         {/* Menu Sections */}

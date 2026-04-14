@@ -77,7 +77,13 @@ const OnboardingScreen = () => {
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-background safe-top safe-bottom">
       {/* Background Audio configured to play only here */}
-      <audio ref={audioRef} src="/audio/wego-onboarding.mp3" loop preload="auto" className="hidden" />
+      <audio 
+        ref={audioRef} 
+        src="/audio/wego-onboarding.mp3" 
+        loop 
+        preload="none" 
+        className="hidden" 
+      />
 
       <AnimatePresence mode="wait">
         <motion.div

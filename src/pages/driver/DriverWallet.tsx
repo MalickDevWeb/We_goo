@@ -19,80 +19,117 @@ const DriverWallet = () => {
   }, [session]);
 
   return (
-    <div className="min-h-screen bg-background safe-top safe-bottom">
-      <div className="flex items-center px-4 pt-4">
-        <button onClick={() => navigate(-1)} className="tap-target p-2 rounded-xl hover:bg-muted" aria-label={t('common.back')}>
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </button>
-        <h1 className="text-lg font-bold text-foreground ml-2">{t('driver.wallet.title')}</h1>
-      </div>
+    <div className="h-[100svh] bg-background relative overflow-hidden flex flex-col safe-top">
+      {/* Background Orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-accent/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent2/10 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="px-6 pt-6">
+      {/* Header */}
+      <header className="relative z-10 px-4 pt-4 pb-2 flex items-center justify-between">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="w-12 h-12 rounded-full glass-strong border border-white/10 flex items-center justify-center active:scale-90 transition-transform shadow-lg"
+          aria-label={t('common.back')}
+        >
+          <ArrowLeft className="w-5 h-5 text-white" />
+        </button>
+        <div className="flex flex-col items-center">
+          <img src="/wego-logo.svg" alt="Wego" className="h-10 w-auto drop-shadow-lg" />
+        </div>
+        <div className="w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
+           <Wallet className="w-5 h-5 text-accent" />
+        </div>
+      </header>
+
+      <div className="relative z-10 flex-1 overflow-y-auto no-scrollbar px-6 pt-6 pb-24">
+        <h1 className="text-3xl font-black text-white tracking-tight mb-8">Votre Portefeuille</h1>
+
         {/* Balance Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-2xl p-6 text-center mb-4"
+          className="glass-strong rounded-[40px] p-8 text-center mb-6 border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.4)] relative overflow-hidden"
         >
-          <Wallet className="w-8 h-8 text-accent2 mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">{t('driver.wallet.balance')}</p>
-          <p className="text-4xl font-bold text-foreground mt-1">${driver?.walletBalance?.toLocaleString() || '0'}</p>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-accent2/5 rounded-full blur-3xl -mr-16 -mt-16" />
+          <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/30 mb-3">{t('driver.wallet.balance')}</p>
+          <p className="text-5xl font-black text-white tracking-tighter mb-4">
+            {driver?.walletBalance?.toLocaleString() || '0'} <span className="text-xl text-white/30 ml-1">CFA</span>
+          </p>
+          <button className="px-6 py-2.5 rounded-full bg-accent2 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-accent2/30 active:scale-95 transition-transform">
+             Retirer les fonds
+          </button>
         </motion.div>
 
         {/* Commission & Debt */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-4 mb-10">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass rounded-xl p-4 text-center"
+            className="glass-strong rounded-[28px] p-5 border border-white/5 relative overflow-hidden"
           >
-            <p className="text-xs text-muted-foreground mb-1">{t('driver.wallet.commission')}</p>
-            <p className="text-lg font-bold text-accent">$450</p>
+            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-3">
+              <ArrowUpCircle className="w-5 h-5 text-accent2" />
+            </div>
+            <p className="text-xl font-black text-white tracking-tight">450 <span className="text-[10px] text-white/30 ml-0.5">CFA</span></p>
+            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mt-1">{t('driver.wallet.commission')}</p>
           </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="glass rounded-xl p-4 text-center"
+            className="glass-strong rounded-[28px] p-5 border border-white/5 relative overflow-hidden"
           >
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <AlertTriangle className="w-3.5 h-3.5 text-destructive" />
-              <p className="text-xs text-muted-foreground">{t('driver.wallet.debt')}</p>
+            <div className="w-10 h-10 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center mb-3">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
             </div>
-            <p className="text-lg font-bold text-destructive">${driver?.debt || 0}</p>
+            <p className="text-xl font-black text-destructive tracking-tight">{driver?.debt || 0} <span className="text-[10px] text-destructive/40 ml-0.5">CFA</span></p>
+            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mt-1">{t('driver.wallet.debt')}</p>
           </motion.div>
         </div>
 
         {/* Transactions */}
-        <h2 className="text-lg font-semibold text-foreground mb-4">{t('user.wallet.transactions')}</h2>
+        <div className="flex items-center justify-between mb-6 px-2">
+          <h2 className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em]">{t('user.wallet.transactions')}</h2>
+          <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Tout voir</span>
+        </div>
+
         {transactions.length === 0 ? (
-          <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground text-sm">{t('user.wallet.noTransactions')}</p>
+          <div className="glass-strong rounded-[32px] p-10 text-center border border-white/5 opacity-40 bg-white/[0.02]">
+            <p className="text-xs font-black text-white uppercase tracking-widest">{t('user.wallet.noTransactions')}</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {transactions.map(tx => (
+          <div className="space-y-4">
+            {transactions.map((tx, idx) => (
               <motion.div
                 key={tx.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="glass rounded-xl p-4 flex items-center justify-between"
+                transition={{ delay: idx * 0.05 }}
+                className="glass-strong rounded-[24px] p-5 flex items-center justify-between border border-white/5 group hover:bg-white/[0.04] transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  {tx.type === 'credit' ? (
-                    <ArrowUpCircle className="w-5 h-5 text-accent2" />
-                  ) : (
-                    <ArrowDownCircle className="w-5 h-5 text-accent" />
-                  )}
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-colors ${
+                    tx.type === 'credit' ? 'bg-accent2/10 border-accent2/20 text-accent2' : 'bg-accent/10 border-accent/20 text-accent'
+                  }`}>
+                    {tx.type === 'credit' ? (
+                      <ArrowUpCircle className="w-6 h-6" />
+                    ) : (
+                      <ArrowDownCircle className="w-6 h-6" />
+                    )}
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">{tx.title}</p>
-                    <p className="text-xs text-muted-foreground">{tx.date}</p>
+                    <p className="text-sm font-black text-white mb-0.5 leading-tight">{tx.title}</p>
+                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-tighter">{tx.date}</p>
                   </div>
                 </div>
-                <span className={`text-sm font-semibold ${tx.type === 'credit' ? 'text-accent2' : 'text-accent'}`}>
-                  {tx.type === 'credit' ? '+' : '-'}${tx.amount}
-                </span>
+                <div className="text-right">
+                   <p className={`text-lg font-black tracking-tight ${tx.type === 'credit' ? 'text-accent2' : 'text-white'}`}>
+                     {tx.type === 'credit' ? '+' : '-'}{tx.amount}
+                   </p>
+                   <p className="text-[9px] font-bold text-white/20 uppercase">CFA</p>
+                </div>
               </motion.div>
             ))}
           </div>
