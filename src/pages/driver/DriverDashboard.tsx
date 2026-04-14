@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Power, Star, Car, DollarSign, Clock, Check, X, List, TrendingUp, Wallet, MessageCircle, ArrowLeft, LogOut, Navigation2, ChevronRight, Activity } from 'lucide-react';
+import { Power, Star, Car, DollarSign, Clock, Check, X, List, TrendingUp, Wallet, MessageCircle, ArrowLeft, LogOut, Navigation2, ChevronRight, Activity, Bell } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import * as api from '@/services/api';
 import type { Driver, Ride } from '@/types';
@@ -84,32 +84,33 @@ const DriverDashboard = () => {
             </div>
           </div>
         </div>
-        <button 
-          onClick={handleLogout} 
-          className="w-12 h-12 rounded-2xl glass-strong border border-white/10 flex items-center justify-center active:scale-90 transition-transform"
-          aria-label="Logout"
-        >
-          <LogOut className="w-5 h-5 text-white/40" />
-        </button>
+        <div className="flex gap-2">
+           <button 
+             onClick={() => navigate('/driver/notifications')}
+             className="w-12 h-12 rounded-2xl glass-strong border border-white/10 flex items-center justify-center active:scale-90 transition-transform relative"
+           >
+             <Bell className="w-5 h-5 text-white/60" />
+             {availableRides.length > 0 && <div className="absolute top-3 right-3 w-2 h-2 bg-accent rounded-full border-2 border-background" />}
+           </button>
+        </div>
       </header>
 
       <div className="relative z-10 flex-1 overflow-y-auto no-scrollbar px-6 pb-24">
         
         {/* Neon Online Toggle Card */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="relative mb-8"
         >
           <button
             onClick={toggleOnline}
-            className={`w-full rounded-[32px] p-1.5 border transition-all duration-700 relative overflow-hidden group ${
+            className={`w-full rounded-[36px] p-2 border transition-all duration-700 relative overflow-hidden group ${
               driver?.isOnline 
-                ? 'border-accent2/40 bg-accent2/5 shadow-[0_0_50px_rgba(154,230,180,0.15)]' 
-                : 'border-white/5 bg-white/5 shadow-none'
+                ? 'border-accent2/40 bg-accent2/5 shadow-[0_20px_50px_rgba(154,230,180,0.1)]' 
+                : 'border-white/10 bg-white/5'
             }`}
           >
-            {/* Glossy overlay */}
             <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
             
             <div className="flex items-center justify-between p-5 relative z-10">
@@ -121,10 +122,10 @@ const DriverDashboard = () => {
                 </div>
                 <div className="text-left">
                   <span className={`block font-black text-lg tracking-tight ${driver?.isOnline ? 'text-white' : 'text-white/40'}`}>
-                    {driver?.isOnline ? 'Disponible' : 'Indisponible'}
+                    {driver?.isOnline ? 'Vous êtes en ligne' : 'Vous êtes hors ligne'}
                   </span>
-                  <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-white/30">
-                    {driver?.isOnline ? 'Prêt pour des courses' : 'Mode repos activé'}
+                  <span className="text-[10px] uppercase font-black tracking-[0.2em] text-white/20">
+                    {driver?.isOnline ? 'Prêt pour encaisser' : 'Reposez-vous bien'}
                   </span>
                 </div>
               </div>
@@ -133,9 +134,8 @@ const DriverDashboard = () => {
                 driver?.isOnline ? 'bg-accent2/20 border border-accent2/30' : 'bg-white/5 border border-white/10'
               }`}>
                 <motion.div 
-                  animate={{ x: driver?.isOnline ? 32 : 0 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className={`w-5 h-5 rounded-full shadow-lg ${driver?.isOnline ? 'bg-accent2' : 'bg-white/20'}`} 
+                   animate={{ x: driver?.isOnline ? 32 : 0 }}
+                   className={`w-5 h-5 rounded-full ${driver?.isOnline ? 'bg-accent2 shadow-[0_0_10px_rgba(154,230,180,1)]' : 'bg-white/20'}`} 
                 />
               </div>
             </div>
@@ -147,41 +147,20 @@ const DriverDashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 gap-4 mb-8"
+          className="grid grid-cols-2 gap-4 mb-10"
         >
-          <div className="glass-strong rounded-[28px] p-5 border border-white/5 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-accent/10 rounded-full blur-[30px] -translate-x-5 -translate-y-5" />
-            <DollarSign className="w-5 h-5 text-accent mb-3 drop-shadow-md" />
+          <div className="glass-strong rounded-[32px] p-6 border border-white/5 relative overflow-hidden group">
+            <DollarSign className="w-5 h-5 text-accent mb-3" />
             <p className="text-2xl font-black text-white tracking-tight">{driver?.todayEarnings || 0} <span className="text-[10px] text-white/30 ml-0.5">CFA</span></p>
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Gains du jour</p>
+            <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mt-1">Gains du jour</p>
           </div>
           
-          <div className="glass-strong rounded-[28px] p-5 border border-white/5 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-accent2/10 rounded-full blur-[30px] -translate-x-5 -translate-y-5" />
-            <Activity className="w-5 h-5 text-accent2 mb-3 drop-shadow-md" />
+          <div className="glass-strong rounded-[32px] p-6 border border-white/5 relative overflow-hidden group">
+            <Activity className="w-5 h-5 text-accent2 mb-3" />
             <p className="text-2xl font-black text-white tracking-tight">{driver?.todayRides || 0}</p>
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Courses</p>
+            <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mt-1">Courses</p>
           </div>
         </motion.div>
-
-        {/* Navigation Quick Access */}
-        <div className="flex gap-3 mb-10 overflow-x-auto no-scrollbar pb-2">
-          {navItems.map((item, idx) => (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 + idx * 0.05 }}
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className="glass rounded-3xl p-4 flex flex-col items-center gap-3 min-w-[90px] h-[90px] border border-white/5 transition-all active:scale-95 group hover:border-white/20 hover:bg-white/5"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-accent/10 transition-colors">
-                <item.icon className="w-5 h-5 text-accent group-hover:scale-110 transition-transform" />
-              </div>
-              <span className="text-[9px] font-black text-white/50 uppercase tracking-widest whitespace-nowrap">{item.label}</span>
-            </motion.button>
-          ))}
-        </div>
 
         {/* Available Rides Section */}
         <div className="flex items-center justify-between mb-6">

@@ -36,7 +36,7 @@ export interface Driver {
   idPhoto?: string;
   vehicleBrand?: string;
   vehicleModel?: string;
-  licensePlate?: string;
+  vehiclePlate?: string;
   createdAt?: string;
 }
 
