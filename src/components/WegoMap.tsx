@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -83,6 +83,9 @@ interface WegoMapProps {
   onMapClick?: (lat: number, lng: number) => void;
 }
 
+// Dakar center as fallback
+const DAKAR_DEFAULT: [number, number] = [14.7167, -17.4677];
+
 const WegoMap = ({
   markers,
   routePoints,
@@ -94,14 +97,32 @@ const WegoMap = ({
   variant = 'dark',
   onMapClick,
 }: WegoMapProps) => {
+  const [userPos, setUserPos] = useState<[number, number] | null>(null);
+
+  useEffect(() => {
+    if (!center && markers.length === 0 && !routePoints) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
+        () => setUserPos(DAKAR_DEFAULT), // Fallback to Dakar on error/denial
+        { enableHighAccuracy: true }
+      );
+    }
+  }, [center, markers.length, routePoints]);
+
   const allPositions = useMemo(() => {
     const pts: [number, number][] = markers.map(m => m.position);
     if (routePoints) pts.push(...routePoints);
     return pts;
   }, [markers, routePoints]);
 
-  const mapCenter = center || (allPositions.length > 0 ? allPositions[0] : [20, 0] as [number, number]);
-  const initialZoom = center ? zoom : (allPositions.length > 0 ? 13 : 2);
+  // Priority: 1. Props center, 2. Markers/Route, 3. Detected User Position, 4. Dakar Fallback
+  const mapCenter = useMemo(() => {
+    if (center) return center;
+    if (allPositions.length > 0) return allPositions[0];
+    return userPos || DAKAR_DEFAULT;
+  }, [center, allPositions, userPos]);
+
+  const initialZoom = center ? zoom : (allPositions.length > 0 ? 13 : 13);
 
   return (
     <div style={{ height, width: '100%' }} className={className}>

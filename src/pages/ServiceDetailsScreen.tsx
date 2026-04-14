@@ -4,12 +4,17 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
+import LocationSearchInput from '@/components/LocationSearchInput';
+import { useState } from 'react';
 
 const ServiceDetailsScreen = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { serviceKey } = useParams();
   const { session } = useAuthStore();
+  const [address, setAddress] = useState('');
+  const [pickupAddress, setPickupAddress] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
 
   const service = useMemo(() => getServiceByKey(serviceKey), [serviceKey]);
   const safeKey = isServiceKey(serviceKey ?? '') ? serviceKey : servicesCatalog[0].key;
@@ -62,7 +67,7 @@ const ServiceDetailsScreen = () => {
   const Icon = service.icon;
 
   return (
-    <div className="h-[100svh] overflow-hidden bg-background safe-top safe-bottom">
+    <div className="min-h-[100svh] overflow-x-hidden pb-10 bg-background safe-top safe-bottom">
       <div className="px-6 pt-4">
         <button
           type="button"
@@ -138,16 +143,15 @@ const ServiceDetailsScreen = () => {
       <div className="px-6 pt-4 space-y-4">
         {safeKey === 'packages' && (
           <div className="space-y-3">
-            <div className="flex gap-2">
-              <div className="flex-1 p-3 rounded-xl bg-card border border-border/40 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-accent" />
-                <span className="text-xs text-muted-foreground">Retrait</span>
-              </div>
-              <div className="flex-1 p-3 rounded-xl bg-card border border-border/40 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-accent rotate-180" />
-                <span className="text-xs text-muted-foreground">Livraison</span>
-              </div>
-            </div>
+              <LocationSearchInput
+                value={address}
+                onChange={setAddress}
+                onSelect={(val) => {
+                  setAddress(val);
+                }}
+                placeholder="Où livrez-vous ?"
+                label="Destination"
+              />
             <button
               type="button"
               onClick={() => handleActionClick('packages', 'standard')}
@@ -176,36 +180,34 @@ const ServiceDetailsScreen = () => {
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground shrink-0 ml-auto" />
             </button>
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Zap className="w-3 h-3" />
-                <span>Rapide</span>
-              </div>
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Shield className="w-3 h-3" />
-                <span>Assuré</span>
-              </div>
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Clock className="w-3 h-3" />
-                <span>Suivi</span>
-              </div>
+            <div className="grid grid-cols-3 gap-2">
+              <button onClick={() => handleActionClick('packages', 'standard')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
+                <Package className="w-5 h-5 text-accent" />
+                <span className="text-xs text-muted-foreground">Petit</span>
+              </button>
+              <button onClick={() => handleActionClick('packages', 'standard')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
+                <Package className="w-5 h-5 text-accent" />
+                <span className="text-xs text-muted-foreground">Moyen</span>
+              </button>
+              <button onClick={() => handleActionClick('packages', 'standard')} className="p-2 rounded-xl bg-card border border-border/40 flex flex-col items-center gap-1 tap-target">
+                <Package className="w-5 h-5 text-accent" />
+                <span className="text-xs text-muted-foreground">Grand</span>
+              </button>
             </div>
           </div>
         )}
 
         {safeKey === 'rides' && (
           <div className="space-y-3">
-            <div className="p-3 rounded-xl bg-card border border-border/40">
-              <div className="flex items-center gap-2 mb-2">
-                <MapPin className="w-4 h-4 text-accent" />
-                <span className="text-xs text-muted-foreground">Destination</span>
-              </div>
-              <input
-                type="text"
+              <LocationSearchInput
+                value={address}
+                onChange={setAddress}
+                onSelect={(val) => {
+                  setAddress(val);
+                }}
                 placeholder="Où allez-vous ?"
-                className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+                label="Destination"
               />
-            </div>
             <button
               type="button"
               onClick={() => handleActionClick('rides', 'private')}
@@ -248,45 +250,13 @@ const ServiceDetailsScreen = () => {
                 <span className="text-xs text-muted-foreground">Van</span>
               </button>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Shield className="w-3 h-3" />
-                <span>Chauffeurs vérifiés</span>
-              </div>
-              <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
-                <Zap className="w-3 h-3" />
-                <span>5 min attente</span>
-              </div>
-            </div>
+
           </div>
         )}
 
         {safeKey === 'rental' && (
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-card border border-border/40">
-                <div className="flex items-center gap-2 mb-2">
-                  <Navigation className="w-4 h-4 text-accent" />
-                  <span className="text-xs text-muted-foreground">Retrait</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Lieu"
-                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
-                />
-              </div>
-              <div className="p-3 rounded-xl bg-card border border-border/40">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-accent" />
-                  <span className="text-xs text-muted-foreground">Dates</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Début - Fin"
-                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
-                />
-              </div>
-            </div>
+
             <button
               type="button"
               onClick={() => handleActionClick('rental')}
@@ -301,15 +271,6 @@ const ServiceDetailsScreen = () => {
               </div>
               <ArrowRight className="w-5 h-5 text-white ml-auto" />
             </button>
-            <div className="p-3 rounded-xl bg-card border border-border/40">
-              <div className="flex items-center gap-3">
-                <Navigation className="w-5 h-5 text-accent" />
-                <div className="flex-1">
-                  <div className="text-sm font-semibold text-foreground">Lieu de retrait</div>
-                  <div className="text-xs text-muted-foreground">Aéroport, gare, ville</div>
-                </div>
-              </div>
-            </div>
             <div className="flex gap-2">
               <div className="flex-1 flex items-center justify-center gap-1 p-2 rounded-lg bg-accent/10 text-xs text-accent">
                 <Shield className="w-3 h-3" />
@@ -346,14 +307,12 @@ const ServiceDetailsScreen = () => {
 
         {safeKey === 'commerce' && (
           <div className="space-y-3">
-            <div className="p-3 rounded-xl bg-card border border-border/40 flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-accent shrink-0" />
-              <input
-                type="text"
-                placeholder="Adresse de livraison"
-                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
-              />
-            </div>
+            <LocationSearchInput
+              value={address}
+              onChange={setAddress}
+              onSelect={setAddress}
+              placeholder="Adresse de livraison"
+            />
             <button
               type="button"
               onClick={() => handleActionClick('commerce')}
@@ -451,17 +410,13 @@ const ServiceDetailsScreen = () => {
         {safeKey === 'hotels' && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-card border border-border/40">
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="w-4 h-4 text-accent" />
-                  <span className="text-xs text-muted-foreground">Destination</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Ville, hôtel..."
-                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
-                />
-              </div>
+              <LocationSearchInput
+                value={address}
+                onChange={setAddress}
+                onSelect={setAddress}
+                placeholder="Ville, hôtel..."
+                label="Destination"
+              />
               <div className="p-3 rounded-xl bg-card border border-border/40">
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="w-4 h-4 text-accent" />

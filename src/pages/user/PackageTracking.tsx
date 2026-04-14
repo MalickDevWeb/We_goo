@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Package, CheckCircle2, Clock, Truck, MapPin,
-  Phone, Star, ChevronDown, ChevronUp, MessageCircle,
+  Phone, Star, ChevronDown, ChevronUp, ChevronRight, MessageCircle,
   Shield, Copy, X, ShoppingBag, Zap
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -42,7 +42,16 @@ const PackageTracking = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const pkg = location.state?.package;
+  const pkgInitial = location.state?.package || {
+    id: `WG-DEMO-${Math.floor(1000 + Math.random() * 9000)}`,
+    description: 'Colis de test (Mode Démo)',
+    status: 'accepted',
+    pickupAddress: 'Plateau, Place de l\'Indépendance',
+    deliveryAddress: 'Almadies, Route des Almadies',
+    weight: '1.5',
+    pickupPin: '4321'
+  };
+  const [pkg, setPkg] = useState(pkgInitial);
 
   // Map & movement state
   const [route, setRoute]         = useState<[number, number][]>([]);
@@ -56,7 +65,10 @@ const PackageTracking = () => {
   const [sheetExpanded, setSheetExpanded] = useState(false);
   const [showPreview, setShowPreview]   = useState(false);
   const [showOTP, setShowOTP]             = useState(false);
+  const [showPickup, setShowPickup]       = useState(true); // Default to showing pickup if status is accepted
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const OTP_CODE = '4729';
+  const PICKUP_PIN = pkg?.pickupPin || '8821';
 
   // ── Load real OSRM route ──────────────────────────────────────────────────
   useEffect(() => {
@@ -83,7 +95,7 @@ const PackageTracking = () => {
   useEffect(() => {
     if (route.length < 2 || totalDist === 0) return;
     // Only animate if in-progress
-    if (pkg?.status && !['in-progress', 'accepted', 'arriving'].includes(pkg.status)) return;
+    if (pkg?.status && !['in-progress', 'arriving'].includes(pkg.status)) return;
 
     const TICK_MS = 60; // Silky smooth 60ms tracking (~16fps)
     const distPerTick = (speedKmh / 3600) * (TICK_MS / 1000); // km per tick
@@ -121,14 +133,32 @@ const PackageTracking = () => {
 
   // ── Timeline steps ────────────────────────────────────────────────────────
   const steps = useMemo(() => [
-    { icon: Package,     label: 'Colis récupéré',  sub: '10:15 · Plateau',   done: true,           active: false },
-    { icon: Truck,       label: 'En transit',       sub: 'Route des Almadies', done: progress > 0.5, active: progress <= 0.5 },
-    { icon: MapPin,      label: 'Arrivé',           sub: 'Almadies',           done: progress >= 1,  active: false },
-  ], [progress]);
+    { icon: Package,     label: pkg?.status === 'accepted' ? 'Collecte en attente' : 'Colis récupéré',  sub: pkg?.status === 'accepted' ? 'Coursier en route' : '10:15 · Plateau',   done: pkg?.status !== 'accepted',           active: pkg?.status === 'accepted' },
+    { icon: Truck,       label: 'En transit',       sub: 'Route des Almadies', done: progress > 0.5, active: pkg?.status === 'in-progress' && progress <= 0.5 },
+    { icon: MapPin,      label: 'Arrivé',           sub: 'Almadies',           done: progress >= 1,  active: pkg?.status === 'arriving' },
+  ], [progress, pkg?.status]);
 
   const handleCopyOTP = () => {
     navigator.clipboard?.writeText(OTP_CODE);
     toast.success('Code copié !');
+  };
+
+  const simulateDelivery = () => {
+    setPkg(prev => ({ ...prev, status: 'delivered' }));
+    setProgress(1);
+    toast.success('Colis marqué comme livré ! (Simulation)');
+  };
+
+  const simulatePickup = () => {
+    setPkg(prev => ({ ...prev, status: 'in-progress' }));
+    setShowPickup(false);
+    toast.success('Colis collecté avec succès !');
+  };
+
+  const handleCancelPackage = async () => {
+    setPkg(prev => ({ ...prev, status: 'cancelled' }));
+    toast.info("Envoi annulé");
+    navigate('/user/dashboard');
   };
 
   return (
@@ -184,6 +214,80 @@ const PackageTracking = () => {
 
         <div className="flex-1 overflow-y-auto no-scrollbar px-5 pb-6 space-y-3 pt-1">
 
+          {/* ── Pickup validation for sender (MOVED TO TOP FOR VISIBILITY) ── */}
+          {pkg?.status === 'accepted' && (
+            <motion.div 
+               initial={{ scale: 0.95, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               className={`glass rounded-[24px] border-2 ${showPickup ? 'border-accent shadow-[0_0_30px_rgba(230,32,87,0.2)] bg-accent/5' : 'border-accent/20 bg-accent/5'} overflow-hidden transition-all duration-500 mb-4`}
+            >
+              <button
+                onClick={() => setShowPickup(!showPickup)}
+                className="w-full p-5 flex items-center justify-between active:bg-white/5 transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center relative shadow-lg shadow-accent/20">
+                    <Package className="w-6 h-6 text-white" />
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                       <div className="w-2 h-2 bg-accent rounded-full animate-ping" />
+                    </div>
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] font-black text-accent uppercase tracking-[0.2em] animate-pulse">Action Requise</p>
+                    <p className="text-base font-black text-white">Confirmer le Ramassage</p>
+                  </div>
+                </div>
+                {showPickup ? <ChevronDown className="w-5 h-5 text-white/30" /> : <ChevronRight className="w-5 h-5 text-white/30" />}
+              </button>
+              
+              <AnimatePresence>
+                {showPickup && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="px-5 pb-8 flex flex-col items-center"
+                  >
+                    <div className="w-full h-px bg-white/10 mb-6" />
+                    
+                    <div className="relative group mb-8">
+                      <div className="absolute -inset-6 bg-accent/30 rounded-full blur-[40px] opacity-50 group-hover:opacity-100 transition-opacity" />
+                      <div className="w-48 h-48 bg-white rounded-[32px] flex items-center justify-center p-4 shadow-2xl relative transition-transform hover:scale-105">
+                         <img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=000000&bgcolor=ffffff&data=PICKUP-${pkg?.id}`} alt="QR Code Collecte" className="w-full h-full" />
+                         <div className="absolute -bottom-3 inset-x-4 h-8 bg-accent rounded-xl flex items-center justify-center text-[10px] font-black text-white uppercase tracking-widest shadow-xl shadow-accent/40 border border-white/20">
+                           QR Code de Collecte
+                         </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full bg-black/20 rounded-[24px] p-4 border border-white/5 flex flex-col items-center mb-6">
+                      <p className="text-[9px] text-white/40 uppercase tracking-[0.3em] font-black mb-3 italic">OU DONNER LE CODE PIN</p>
+                      <div className="flex items-center gap-4">
+                        <p className="text-[40px] font-black text-accent tracking-[0.3em] font-mono">{PICKUP_PIN}</p>
+                        <button 
+                          onClick={handleCopyOTP} 
+                          className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center text-accent hover:bg-accent hover:text-white transition-all border border-accent/20"
+                          title="Copier le code PIN"
+                          aria-label="Copier le code PIN"
+                        >
+                          <Copy className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={simulatePickup}
+                      className="w-full py-4 rounded-2xl gradient-accent text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-accent/30 active:scale-[0.98] transition-all relative overflow-hidden group"
+                    >
+                      <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 group-hover:h-full transition-all duration-300 opacity-20" />
+                      <span className="relative z-10">Simuler Scan Livreur (Collecte)</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+
           {/* ── ETA card ── */}
           <div className="glass rounded-[20px] p-4 flex items-center justify-between border border-white/5">
             <div className="flex items-center gap-3">
@@ -192,15 +296,15 @@ const PackageTracking = () => {
               </div>
               <div>
                 <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Arrivée estimée</p>
-                {progress < 1
-                  ? <p className="text-2xl font-black text-white tabular-nums">~{etaMin} <span className="text-sm text-white/40">min</span></p>
-                  : <p className="text-lg font-black text-accent2">Livré ✓</p>
+                {pkg?.status === 'delivered' || progress >= 1
+                  ? <p className="text-xl font-black text-accent2 flex items-center gap-2">Colis Livré <CheckCircle2 className="w-5 h-5" /></p>
+                  : <p className="text-2xl font-black text-white tabular-nums">~{etaMin} <span className="text-sm text-white/40">min</span></p>
                 }
               </div>
             </div>
             <div className="text-right">
               <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Restant</p>
-              <p className="text-sm font-black text-white">{remainingDist.toFixed(1)} km</p>
+              <p className="text-sm font-black text-white">{pkg?.status === 'delivered' ? '0' : remainingDist.toFixed(1)} km</p>
             </div>
           </div>
 
@@ -299,29 +403,88 @@ const PackageTracking = () => {
             </div>
           </div>
 
+
           {/* ── OTP code for delivery ── */}
-          <button
-            onClick={() => setShowOTP(!showOTP)}
-            className="w-full glass rounded-[20px] p-4 border border-white/5 flex items-center justify-between active:scale-[0.98] transition-all"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-accent" />
+          {(pkg?.status === 'arriving' || pkg?.status === 'delivered') && (
+            <div className={`glass rounded-[24px] border ${pkg?.status === 'delivered' ? 'border-accent2/20 bg-accent2/5' : 'border-white/5'} overflow-hidden transition-all duration-500`}>
+              {pkg?.status === 'delivered' ? (
+              <div className="p-6 flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-accent2/20 flex items-center justify-center mb-4 scale-animation">
+                  <CheckCircle2 className="w-8 h-8 text-accent2" />
+                </div>
+                <h3 className="text-lg font-black text-white mb-2">Livraison Confirmée</h3>
+                <p className="text-xs text-white/40">Merci d'avoir choisi Wego. Votre colis a été validé par OTP/QR Code.</p>
               </div>
-              <div className="text-left">
-                <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Code de confirmation</p>
-                <p className="text-sm font-black text-white">
-                  {showOTP ? OTP_CODE : '••••'}
-                </p>
-              </div>
-            </div>
-            {showOTP
-              ? <button onClick={e => { e.stopPropagation(); handleCopyOTP(); }} className="flex items-center gap-1 text-accent text-[10px] font-black">
-                  <Copy className="w-3 h-3" /> Copier
+            ) : (
+              <>
+                <button
+                  onClick={() => setShowOTP(!showOTP)}
+                  className="w-full p-4 flex items-center justify-between active:bg-white/5 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center relative">
+                      <Shield className="w-5 h-5 text-accent" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#0A0A0B] animate-pulse" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Validation Indispensable</p>
+                      <p className="text-sm font-black text-white">
+                        {showOTP ? 'Masquer le code' : 'Afficher OTP / QR Code'}
+                      </p>
+                    </div>
+                  </div>
+                  {showOTP
+                    ? <ChevronUp className="w-4 h-4 text-white/30" />
+                    : <ChevronDown className="w-4 h-4 text-white/30" />
+                  }
                 </button>
-              : <ChevronDown className="w-4 h-4 text-white/30" />
-            }
-          </button>
+                <AnimatePresence>
+                  {showOTP && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="px-4 pb-6 flex flex-col items-center"
+                    >
+                      <div className="w-full h-px bg-white/5 mb-4" />
+                      <p className="text-[10px] text-center text-white/60 mb-5 px-4 font-medium leading-relaxed">
+                        À l'arrivée du chauffeur, présentez ce code ou faites scanner le QR Code pour valider la réception.
+                      </p>
+                      
+                      <div className="group relative">
+                        <div className="absolute -inset-2 bg-accent/20 rounded-[30px] blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="w-40 h-40 bg-white rounded-[28px] flex items-center justify-center p-4 shadow-[0_20px_50px_rgba(230,32,87,0.3)] relative transition-transform hover:scale-105 active:scale-95 cursor-pointer">
+                           <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=e62057&bgcolor=ffffff&data=WEGO-VALIDATE-${pkg?.id || 'PK1'}`} alt="QR Code validation" className="w-full h-full rounded-xl" />
+                           <div className="absolute inset-x-0 -bottom-2 flex justify-center">
+                             <div className="bg-accent px-3 py-1 rounded-full text-[8px] font-black text-white uppercase tracking-tighter shadow-lg shadow-accent/40 border border-white/20">Scan Direct</div>
+                           </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-8 mb-2 flex flex-col items-center">
+                        <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-black mb-3 italic">Validation Manuelle</p>
+                        <div className="flex items-center gap-4 bg-white/5 p-2 pr-2 pl-6 rounded-full border border-white/10 group hover:border-accent/40 transition-colors">
+                          <p className="text-[32px] font-black text-accent tracking-[0.3em]">{OTP_CODE}</p>
+                          <button onClick={e => { e.stopPropagation(); handleCopyOTP(); }} aria-label="Copier le code PIN" className="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent hover:bg-accent hover:text-white transition-all">
+                            <Copy className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Simulator button for DEV/DEMO */}
+                      <button 
+                        onClick={simulateDelivery}
+                        className="mt-6 text-[10px] font-black text-white/20 uppercase tracking-widest hover:text-accent2 transition-colors border-b border-white/5 pb-1"
+                      >
+                        Simuler le scan du chauffeur (Démo)
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
+            )}
+          </div>
+        )}
 
           {/* ── Timeline ── */}
           <div className="glass rounded-[24px] p-4 border border-white/5">
@@ -354,6 +517,18 @@ const PackageTracking = () => {
               );
             })}
           </div>
+
+          {/* ── Cancel Button ── */}
+          {pkg?.status === 'accepted' && progress < 0.15 && (
+            <button 
+              onClick={() => setShowCancelModal(true)}
+              className="w-full mt-4 py-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive font-black text-sm active:scale-95 transition-all shadow-lg hover:bg-destructive/20 flex items-center justify-center gap-2"
+            >
+              <X className="w-5 h-5" />
+              Annuler l'envoi
+            </button>
+          )}
+
         </div>
       </motion.div>
 
@@ -434,6 +609,40 @@ const PackageTracking = () => {
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Cancellation Modal ── */}
+      <AnimatePresence>
+        {showCancelModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[2100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              className="glass-strong rounded-[32px] p-8 max-w-sm w-full border border-white/10 shadow-2xl"
+            >
+              <h2 className="text-2xl font-black text-white mb-2">Annuler l'envoi ?</h2>
+              <p className="text-sm text-white/60 mb-6 leading-relaxed">
+                Êtes-vous sûr de vouloir annuler l'envoi de ce colis ?
+              </p>
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={handleCancelPackage}
+                  className="w-full py-4 rounded-2xl bg-destructive text-white font-black text-sm active:scale-[0.98] transition-all"
+                >
+                  Confirmer
+                </button>
+                <button 
+                  onClick={() => setShowCancelModal(false)}
+                  className="w-full py-4 rounded-2xl glass border border-white/10 text-white font-black text-sm active:scale-[0.98] transition-all"
+                >
+                  Continuer
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

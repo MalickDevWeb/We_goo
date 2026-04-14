@@ -11,6 +11,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import * as api from '@/services/api';
+import LocationSearchInput from '@/components/LocationSearchInput';
 import type { OrderItem, Order } from '@/types/index';
 
 interface Vehicle {
@@ -164,11 +165,13 @@ const UserRental = () => {
       </header>
 
       <div className="px-6 space-y-6 flex-1 pb-32">
-        {/* Search */}
-        <div className="relative glass rounded-[24px] flex items-center px-5 py-4 border border-white/5 focus-within:border-accent/40 transition-all">
-          <Search className="w-5 h-5 text-white/30 mr-3" />
-          <input type="text" placeholder="Rechercher un véhicule..." value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent flex-1 outline-none text-sm font-semibold placeholder:text-white/20" />
-        </div>
+        <LocationSearchInput
+          value={search}
+          onChange={setSearch}
+          onSelect={setSearch}
+          placeholder="Rechercher un véhicule ou lieu..."
+          className="mb-2"
+        />
 
         {/* Categories */}
         <div className="space-y-4">

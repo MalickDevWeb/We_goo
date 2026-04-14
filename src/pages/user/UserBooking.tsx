@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Navigation, Star, X, Loader2, Users, Car, Clock, Sparkles } from 'lucide-react';
+import { MapPin, Navigation, Star, X, Loader2, Users, Car, Clock, Sparkles, ChevronRight, Info, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 import * as api from '@/services/api';
-import { searchLocations, getRealRoute, reverseGeocode, type LocationSuggestion } from '@/services/mapService';
+import { getRealRoute, reverseGeocode, searchLocations } from '@/services/mapService';
 import type { VehicleType, SavedPlace } from '@/types';
-import WegoMap, { pickupIcon, destinationIcon } from '@/components/WegoMap';
-import type { MapMarker } from '@/components/WegoMap';
+import WegoMap, { pickupIcon, destinationIcon, type MapMarker } from '@/components/WegoMap';
+import LocationSearchInput from '@/components/LocationSearchInput';
 
 const UserBooking = () => {
   const { t } = useTranslation();
@@ -72,40 +72,8 @@ const UserBooking = () => {
   }, [pickupCoords, destinationCoords]);
 
   const calculatePrice = (basePrice: number) => {
-    // Basic price calculation: base price + 1.2 per km (example)
     if (distanceKm === 0) return basePrice;
     return Math.round(basePrice + (distanceKm * 1.2));
-  };
-
-  const handleSearch = async (query: string, field: 'pickup' | 'destination') => {
-    if (field === 'pickup') setPickup(query);
-    else setDestination(query);
-    
-    if (query.length > 2) {
-      setLoadingSearch(true);
-      try {
-        const results = await searchLocations(query);
-        setSuggestions(results);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingSearch(false);
-      }
-    } else {
-      setSuggestions([]);
-    }
-  };
-
-  const selectSuggestion = (s: LocationSuggestion) => {
-    if (activeField === 'pickup') {
-      setPickup(s.displayName);
-      setPickupCoords([s.lat, s.lon]);
-    } else {
-      setDestination(s.displayName);
-      setDestinationCoords([s.lat, s.lon]);
-    }
-    setSuggestions([]);
-    setActiveField(null);
   };
 
   const useCurrentLocation = () => {
@@ -122,10 +90,10 @@ const UserBooking = () => {
           const address = await reverseGeocode(coords[0], coords[1]);
           setPickup(address);
         } catch (err) {
-          setPickup("Ubicación actual");
+          setPickup("Ma position");
         }
       },
-      () => toast.error("Error al obtener ubicación")
+      () => toast.error(t('common.error'))
     );
   };
 
@@ -171,129 +139,99 @@ const UserBooking = () => {
   if (destinationCoords) addressMarkers.push({ key: 'dest', position: destinationCoords, icon: destinationIcon });
 
   return (
-    <div className="min-h-full safe-top pb-32">
-      <h1 className="text-xl font-bold text-foreground pt-10 mb-4 px-6">{t('user.booking.title')}</h1>
+    <div className="h-[100svh] overflow-hidden bg-background text-foreground flex flex-col">
+      {/* ── Header ── */}
+      <div className="px-6 pt-12 pb-4 flex items-center justify-between z-20">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="p-2 -ml-2 rounded-full hover:bg-white/5 transition-colors"
+          title={t('common.back')}
+          aria-label={t('common.back')}
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-xl font-black uppercase tracking-tight italic">
+          Wego<span className="text-accent underline decoration-2 underline-offset-4">Ride</span>
+        </h1>
+        <div className="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 text-accent" />
+        </div>
+      </div>
 
-      {step === 'address' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <div className="mx-6 mb-4 rounded-2xl overflow-hidden border border-border h-[220px] relative">
-            <WegoMap
-              markers={addressMarkers.length > 0 ? addressMarkers : (pickupCoords ? [{ key: 'p', position: pickupCoords, icon: pickupIcon }] : [])}
-              routePoints={routePoints}
-              onMapClick={handleMapClick}
-            />
-            {!pickupCoords && !destinationCoords && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
-                <p className="text-white text-xs bg-black/60 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                  Toca el mapa para elegir destino
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="px-6 space-y-3">
-            <div className="relative z-50">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-accent2" />
-              <input
-                value={pickup}
-                onChange={e => handleSearch(e.target.value, 'pickup')}
-                onFocus={() => setActiveField('pickup')}
-                placeholder={t('user.booking.pickupPlaceholder')}
-                className="w-full py-4 pl-10 pr-10 rounded-xl bg-secondary text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-accent tap-target"
+      <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
+        {step === 'address' && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6 space-y-6">
+            
+            {/* ── Map Preview ── */}
+            <div className="rounded-[32px] overflow-hidden border border-white/5 h-[240px] relative shadow-2xl group">
+              <WegoMap
+                markers={addressMarkers}
+                routePoints={routePoints}
+                onMapClick={handleMapClick}
               />
-              {pickup && (
-                <button 
-                  onClick={() => {setPickup(''); setPickupCoords(null)}} 
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground"
-                  aria-label="Clear pickup"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            <div className="relative z-40">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-accent" />
-              <input
-                value={destination}
-                onChange={e => handleSearch(e.target.value, 'destination')}
-                onFocus={() => setActiveField('destination')}
-                placeholder={t('user.booking.destinationPlaceholder')}
-                className="w-full py-4 pl-10 pr-10 rounded-xl bg-secondary text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-accent tap-target"
-              />
-              {destination && (
-                <button 
-                  onClick={() => {setDestination(''); setDestinationCoords(null)}} 
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground"
-                  aria-label="Clear destination"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            <AnimatePresence>
-              {(suggestions.length > 0 || loadingSearch) && activeField && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute left-6 right-6 mt-1 bg-card border border-border rounded-xl overflow-hidden shadow-2xl overflow-y-auto max-h-[200px] z-[1001]"
-                >
-                  {loadingSearch ? (
-                    <div className="p-4 flex justify-center">
-                      <Loader2 className="w-5 h-5 animate-spin text-accent" />
+              {!pickupCoords && !destinationCoords && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] pointer-events-none group-hover:bg-black/20 transition-all">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center animate-bounce">
+                      <MapPin className="w-5 h-5 text-white" />
                     </div>
-                  ) : (
-                    suggestions.map((s, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => selectSuggestion(s)}
-                        className="w-full p-4 flex items-start gap-3 hover:bg-white/5 transition-colors border-b border-white/5 text-left"
-                      >
-                        <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-                        <span className="text-xs text-foreground line-clamp-2">{s.displayName}</span>
-                      </button>
-                    ))
-                  )}
-                </motion.div>
+                    <p className="text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-black/40 rounded-full">
+                      Touche le trajet de ton choix
+                    </p>
+                  </div>
+                </div>
               )}
-            </AnimatePresence>
-
-            <div className="flex justify-between items-center py-1">
-              <button 
-                onClick={useCurrentLocation}
-                className="flex items-center gap-2 text-xs font-semibold text-accent tap-target py-1 px-2 rounded-lg hover:bg-accent/10"
-              >
-                <Navigation className="w-3.5 h-3.5" />
-                {t('user.booking.useMyLocation')}
-              </button>
             </div>
 
-            {savedPlaces.length > 0 && !activeField && (
-              <div>
-                <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-3">{t('user.booking.savedPlaces')}</p>
-                <div className="space-y-2">
-                  {savedPlaces.map(place => (
+            {/* ── Route Inputs ── */}
+            <div className="glass rounded-[32px] p-2 border border-white/5 relative bg-gradient-to-b from-white/5 to-transparent">
+              <div className="p-4 space-y-4">
+                <LocationSearchInput
+                  value={pickup}
+                  onChange={setPickup}
+                  onSelect={(name, coords) => {
+                    setPickup(name);
+                    if (coords) setPickupCoords(coords);
+                  }}
+                  placeholder={t('user.booking.pickupPlaceholder')}
+                  label="Point de départ"
+                  showCurrentLocation={true}
+                />
+                <div className="h-px bg-white/5 mx-4" />
+                <LocationSearchInput
+                  value={destination}
+                  onChange={setDestination}
+                  onSelect={(name, coords) => {
+                    setDestination(name);
+                    if (coords) setDestinationCoords(coords);
+                  }}
+                  placeholder={t('user.booking.destinationPlaceholder')}
+                  label="Destination"
+                />
+              </div>
+            </div>
+
+            {/* ── Quick Actions ── */}
+            {savedPlaces.length > 0 && (
+              <div className="px-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-white/30 mb-4">{t('user.booking.savedPlaces')}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {savedPlaces.slice(0, 2).map(place => (
                     <button
                       key={place.id}
                       onClick={async () => {
                         setDestination(place.address);
-                        // We avoid MOCK and use the address to find coords if possible
-                        // For saved places we might need a stored lat/lon, but for now we'll search the address
-                        setLoadingSearch(true);
-                        const results = await searchLocations(place.address);
-                        if (results.length > 0) {
+                        const results = await searchLocations(place.address); // Fallback to api search if needed or manual
+                        if (results && results.length > 0) {
                           setDestinationCoords([results[0].lat, results[0].lon]);
                         }
-                        setLoadingSearch(false);
                       }}
-                      className="w-full glass rounded-xl p-3 flex items-center gap-3 tap-target text-left"
+                      className="glass rounded-2xl p-4 flex flex-col gap-2 tap-target border border-white/5 hover:border-accent/40 transition-all text-left"
                     >
                       <Star className="w-4 h-4 text-accent" />
                       <div>
-                        <p className="text-sm font-medium text-foreground">{place.name}</p>
-                        <p className="text-xs text-muted-foreground line-clamp-1">{place.address}</p>
+                        <p className="text-xs font-black text-foreground truncate">{place.name}</p>
+                        <p className="text-[9px] text-white/40 truncate">{place.address}</p>
                       </div>
                     </button>
                   ))}
@@ -304,237 +242,290 @@ const UserBooking = () => {
             <button
               onClick={() => setStep('vehicle')}
               disabled={!pickupCoords || !destinationCoords}
-              className="w-full py-4 rounded-xl gradient-accent text-accent-foreground font-bold tap-target disabled:opacity-40 mt-4 shadow-lg shadow-accent/20"
+              className="w-full py-5 rounded-[24px] gradient-accent text-white font-black uppercase tracking-widest text-sm tap-target disabled:opacity-40 shadow-[0_20px_40px_-10px_rgba(230,32,87,0.4)] transition-all active:scale-[0.98] mt-4"
             >
-              {t('common.next')}
+              Voir les options de trajet
             </button>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
 
-      {step === 'vehicle' && bookingType !== 'shared' && (
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="px-6 space-y-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-bold text-foreground">{t('user.booking.chooseVehicle')}</p>
-            <button onClick={() => setStep('address')} className="text-xs text-accent font-medium">Cambiar ruta</button>
-          </div>
-          {vehicleTypes.map(vt => {
-            // Speed adjustment factor (Moto is faster in traffic)
-            const speedFactor = vt.label === 'Moto' ? 0.9 : 1.0;
-            const estimatedTime = durationMin > 0 ? Math.ceil(durationMin * speedFactor) : parseInt(vt.time);
-            
-            return (
-              <button
-                key={vt.id}
-                onClick={() => setSelectedVehicle(vt.id)}
-                className={`w-full glass rounded-2xl p-4 flex items-center justify-between tap-target transition-all ${selectedVehicle === vt.id ? 'border-accent ring-2 ring-accent/20' : ''}`}
+        {step === 'vehicle' && bookingType !== 'shared' && (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-6 space-y-6">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-black text-foreground uppercase tracking-tight">{t('user.booking.chooseVehicle')}</h2>
+              <button 
+                onClick={() => setStep('address')} 
+                className="text-[10px] font-black uppercase tracking-widest text-accent bg-accent/10 px-3 py-1.5 rounded-full"
               >
-                <div className="flex items-center gap-4">
-                  <span className="text-3xl filter drop-shadow-sm">{vt.icon}</span>
-                  <div className="text-left">
-                    <p className="font-bold text-foreground text-base">{vt.label}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {estimatedTime} min {durationMin > 0 && <span className="text-[10px] text-accent font-bold opacity-60 ml-1">REAL</span>}
+                Modifier trajet
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {vehicleTypes.map(vt => {
+                const speedFactor = vt.label === 'Moto' ? 0.8 : 1.0;
+                const estimatedTime = durationMin > 0 ? Math.ceil(durationMin * speedFactor) : parseInt(vt.time);
+                const isSelected = selectedVehicle === vt.id;
+                
+                return (
+                  <button
+                    key={vt.id}
+                    onClick={() => setSelectedVehicle(vt.id)}
+                    className={`w-full glass rounded-[28px] p-5 flex items-center justify-between tap-target transition-all border ${isSelected ? 'border-accent shadow-[0_15px_30px_-5px_rgba(230,32,87,0.2)]' : 'border-white/5'}`}
+                  >
+                    <div className="flex items-center gap-5">
+                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors ${isSelected ? 'bg-accent/20' : 'bg-white/5'}`}>
+                        <span className="text-4xl">{vt.icon}</span>
+                      </div>
+                      <div className="text-left">
+                        <p className="font-black text-foreground text-lg tracking-tight mb-1">{vt.label}</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 text-[10px] text-white/40 font-bold uppercase tracking-widest">
+                            <Clock className="w-3 h-3" />
+                            {estimatedTime} min
+                          </div>
+                          <div className="w-1 h-1 rounded-full bg-white/10" />
+                          <p className="text-[10px] text-accent font-black uppercase tracking-widest italic">Fast</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-black text-2xl tracking-tighter transition-colors ${isSelected ? 'text-accent' : 'text-foreground'}`}>
+                        {calculatePrice(vt.price)} <span className="text-xs">CFA</span>
+                      </p>
+                      <div className="flex items-center gap-1 justify-end opacity-40">
+                         <span className="text-[8px] font-black uppercase tracking-tighter">Secure Pay</span>
+                         <ShieldCheck className="w-2.5 h-2.5" />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="pt-6">
+              <button
+                onClick={() => setStep('confirm')}
+                disabled={!selectedVehicle}
+                className="w-full py-5 rounded-[24px] gradient-accent text-white font-black uppercase tracking-widest text-sm tap-target disabled:opacity-40 shadow-[0_20px_40px_-10px_rgba(230,32,87,0.4)] transition-all active:scale-[0.98]"
+              >
+                Confirmer l'option
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 'vehicle' && bookingType === 'shared' && (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-6 space-y-4">
+             {/* Shared taxi logic kept consistent but with Wego style */}
+             <div className="flex items-center justify-between mb-4">
+               <p className="text-[10px] font-black uppercase tracking-widest text-white/40">{sharedState === 'searching' ? 'Analyse du réseau...' : 'Taxi partagé trouvé'}</p>
+               <button onClick={() => setStep('address')} className="text-[10px] font-black uppercase tracking-widest text-accent">Détour</button>
+             </div>
+             
+             <AnimatePresence mode="wait">
+               {sharedState === 'searching' ? (
+                 <motion.div
+                   key="searching"
+                   initial={{ opacity: 0, scale: 0.95 }}
+                   animate={{ opacity: 1, scale: 1 }}
+                   exit={{ opacity: 0, scale: 0.95 }}
+                   className="glass rounded-[40px] p-10 flex flex-col items-center justify-center border border-white/5 h-[360px] relative overflow-hidden shadow-2xl"
+                 >
+                   <div className="absolute inset-0 bg-accent/5 animate-pulse" />
+                   <div className="relative mb-10">
+                     <div className="w-32 h-32 rounded-full border border-accent/20 flex items-center justify-center relative">
+                       <div className="absolute inset-0 rounded-full border border-accent/40 animate-ping opacity-50" />
+                       <div className="w-20 h-20 rounded-full border border-accent/40 flex items-center justify-center bg-accent/5">
+                         <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center">
+                           <Users className="w-6 h-6 text-accent animate-pulse" />
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                   <h3 className="font-black text-foreground mb-4 text-center text-xl tracking-tight italic">Optimisation en cours...</h3>
+                   <div className="bg-black/20 px-6 py-2 rounded-full border border-white/5">
+                      <p className="text-[10px] text-accent font-black text-center uppercase tracking-widest">
+                        <motion.span key={searchLog} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
+                          {searchLog}
+                        </motion.span>
+                      </p>
+                   </div>
+                 </motion.div>
+               ) : (
+                 <motion.div
+                   key="found"
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   className="glass rounded-[40px] border border-accent/30 relative overflow-hidden shadow-2xl shadow-accent/20"
+                 >
+                   <div className="absolute top-0 right-0 w-48 h-48 bg-accent/20 rounded-full blur-[80px] -mr-16 -mt-16" />
+                   <div className="p-8 relative z-10">
+                     <div className="flex justify-between items-start mb-8">
+                       <div className="flex gap-4">
+                         <div className="w-16 h-16 rounded-[24px] bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center shrink-0 shadow-lg shadow-accent/40">
+                           <Car className="w-8 h-8 text-white" />
+                         </div>
+                         <div>
+                           <p className="font-black text-foreground mb-1 text-xl tracking-tighter italic leading-tight">Toyota Partagée</p>
+                           <div className="flex items-center gap-1.5 text-[11px] font-black text-accent bg-accent/10 px-3 py-1 rounded-full inline-flex">
+                             <Star className="w-3 h-3 fill-accent" />
+                             <span>4.9 • Chauffeur Ali</span>
+                           </div>
+                         </div>
+                       </div>
+                       <div className="text-right shrink-0">
+                         <p className="font-black text-3xl text-accent leading-none mb-1">{Math.round(calculatePrice(2))} <span className="text-xs">CFA</span></p>
+                         <p className="text-[10px] text-white/40 font-black bg-white/5 px-2 py-1 rounded-md border border-white/10 uppercase tracking-tighter">ÉCONOMIE 40%</p>
+                       </div>
+                     </div>
+                     
+                     <div className="bg-black/30 rounded-[32px] p-6 mb-8 border border-white/5 backdrop-blur-md">
+                       <div className="flex items-center justify-between mb-4">
+                         <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Disponibilité</span>
+                         <span className="text-[10px] font-black text-accent px-3 py-1 bg-accent/10 rounded-full border border-accent/20">1 PLACE RESTANTE</span>
+                       </div>
+                       <div className="flex gap-2.5 mb-8">
+                          <div className="flex-1 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(230,32,87,0.5)]" />
+                          <div className="flex-1 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(230,32,87,0.5)]" />
+                          <div className="flex-1 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(230,32,87,0.5)] relative">
+                             <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[8px] font-black tracking-widest text-accent bg-accent/10 px-2 py-1 rounded border border-accent/20 uppercase whitespace-nowrap">Occupé</div>
+                          </div>
+                          <div className="flex-1 h-3 rounded-full bg-white/10 border border-white/5" />
+                       </div>
+                       <div className="grid grid-cols-3 gap-2 pt-4 border-t border-white/5">
+                         <div className="flex flex-col items-center text-center">
+                            <div className="w-9 h-9 rounded-2xl bg-white/5 flex items-center justify-center mb-2 border border-white/5 group-hover:border-accent/40">
+                             <MapPin className="w-4 h-4 text-accent" />
+                            </div>
+                           <span className="text-[8px] text-white/30 font-black uppercase tracking-tighter mb-1">Détour</span>
+                           <span className="text-[11px] font-black text-foreground tracking-tight">&lt; 50m</span>
+                         </div>
+                         <div className="flex flex-col items-center text-center">
+                            <div className="w-9 h-9 rounded-2xl bg-white/5 flex items-center justify-center mb-2 border border-white/5">
+                             <Navigation className="w-4 h-4 text-accent" />
+                            </div>
+                           <span className="text-[8px] text-white/30 font-black uppercase tracking-tighter mb-1">Route</span>
+                           <span className="text-[11px] font-black text-accent tracking-tight">100% IDEM</span>
+                         </div>
+                         <div className="flex flex-col items-center text-center">
+                            <div className="w-9 h-9 rounded-2xl bg-white/5 flex items-center justify-center mb-2 border border-white/5">
+                             <Clock className="w-4 h-4 text-accent" />
+                            </div>
+                           <span className="text-[8px] text-white/30 font-black uppercase tracking-tighter mb-1">Passage</span>
+                           <span className="text-[11px] font-black text-foreground tracking-tight">3 min</span>
+                         </div>
+                       </div>
+                     </div>
+                     
+                     <button
+                        onClick={() => {
+                          setSelectedVehicle('shared');
+                          setStep('confirm');
+                        }}
+                        className="w-full py-5 rounded-[24px] relative overflow-hidden group shadow-2xl shadow-accent/40 transition-transform active:scale-[0.98]"
+                     >
+                       <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent/80 group-hover:scale-105 transition-transform" />
+                       <span className="relative z-10 text-white font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3">
+                          <Users className="w-5 h-5 translate-y-[-1px]" />
+                          Réserver ma place
+                       </span>
+                     </button>
+                   </div>
+                 </motion.div>
+               )}
+             </AnimatePresence>
+ 
+             {sharedState === 'found' && (
+               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 bg-accent/5 border border-accent/20 rounded-[24px] p-5 flex gap-4 text-[11px] text-white/60 leading-relaxed font-bold shadow-inner">
+                 <Sparkles className="w-6 h-6 text-accent shrink-0 animate-pulse" />
+                 <p>
+                   <strong className="text-accent uppercase tracking-widest text-[10px] block mb-1">Intelligence Logistique :</strong> Le système a favorisé un trajet existant ayant 3 places occupées pour optimiser les émissions et le coût !
+                 </p>
+               </motion.div>
+             )}
+          </motion.div>
+        )}
+
+        {step === 'confirm' && selectedVT && (
+          <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="p-6 space-y-6">
+            <div className="rounded-[40px] overflow-hidden border border-white/5 h-[200px] shadow-2xl relative">
+              <WegoMap
+                markers={addressMarkers}
+                routePoints={routePoints}
+              />
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            </div>
+            
+            <div className="glass rounded-[40px] p-8 border border-white/5 relative overflow-hidden shadow-2xl">
+              <div className="absolute -right-20 -top-20 w-48 h-48 bg-accent/10 blur-[80px] rounded-full pointer-events-none" />
+              
+              <h3 className="font-black text-foreground text-xl mb-8 tracking-tighter italic flex items-center gap-2">
+                 <Info className="w-5 h-5 text-accent" />
+                 Résumé de la course
+              </h3>
+              
+              <div className="space-y-6">
+                <div className="relative pl-8">
+                  <div className="absolute left-0 top-1.5 w-3 h-3 bg-accent2 rounded-full border-2 border-background z-10" />
+                  <div className="absolute left-[5px] top-4 w-px h-10 bg-white/10" />
+                  <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">{t('user.booking.pickup')}</p>
+                  <p className="text-sm font-bold text-foreground line-clamp-1">{pickup}</p>
+                </div>
+                
+                <div className="relative pl-8">
+                  <div className="absolute left-0 top-1.5 w-3 h-3 bg-accent rounded-full border-2 border-background z-10 shadow-[0_0_10px_rgba(230,32,87,0.5)]" />
+                  <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">{t('user.booking.destination')}</p>
+                  <p className="text-sm font-bold text-foreground line-clamp-1">{destination}</p>
+                </div>
+
+                <div className="flex justify-between items-center bg-white/5 p-4 rounded-3xl border border-white/5 mt-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                       <span className="text-2xl">{selectedVT.icon}</span>
+                    </div>
+                    <p className="text-sm font-black text-white">{selectedVT.label}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] font-black text-white/30 uppercase tracking-widest">Type</p>
+                    <p className="text-xs font-bold text-accent">Premium</p>
+                  </div>
+                </div>
+                
+                <div className="pt-8 mt-4 border-t border-white/10 flex justify-between items-end">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                       <span className="px-2 py-0.5 bg-accent/10 border border-accent/20 rounded text-[9px] font-black text-accent uppercase">{distanceKm.toFixed(1)} km</span>
+                       {bookingType === 'shared' && <span className="px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded text-[9px] font-black text-green-500 uppercase tracking-tighter italic">Eco Score A+</span>}
+                    </div>
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest font-black mb-1">{t('user.booking.total')}</p>
+                    <p className="font-extrabold text-4xl text-gradient tracking-tighter">{calculatePrice(selectedVT.price)} <span className="text-xs">CFA</span></p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-accent font-black uppercase tracking-widest mb-1 italic">{t('user.booking.eta')}</p>
+                    <p className="text-lg text-foreground font-black tracking-tight flex items-center justify-end gap-1">
+                      {Math.ceil(durationMin * (selectedVT.label === 'Moto' ? 0.8 : 1.0))} <span className="text-xs text-white/40">MIN</span>
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-lg text-foreground">${calculatePrice(vt.price)}</p>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">Efectivo/Wallet</p>
-                </div>
-              </button>
-            );
-          })}
-          <button
-            onClick={() => setStep('confirm')}
-            disabled={!selectedVehicle}
-            className="w-full py-4 rounded-xl gradient-accent text-accent-foreground font-bold tap-target disabled:opacity-40 shadow-lg shadow-accent/20 mt-6"
-          >
-            {t('common.next')}
-          </button>
-        </motion.div>
-      )}
-
-      {step === 'vehicle' && bookingType === 'shared' && (
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="px-6 space-y-4">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-bold text-foreground">{sharedState === 'searching' ? 'Analyse du réseau...' : 'Taxi partagé trouvé'}</p>
-            <button onClick={() => setStep('address')} className="text-xs text-accent font-medium">Modifier</button>
-          </div>
-          
-          <AnimatePresence mode="wait">
-            {sharedState === 'searching' ? (
-              <motion.div
-                key="searching"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="glass rounded-3xl p-8 flex flex-col items-center justify-center border border-border/40 h-[320px] relative overflow-hidden shadow-xl"
-              >
-                <div className="absolute inset-0 bg-accent/5 animate-pulse" />
-                <div className="relative mb-8 mt-4">
-                  <div className="w-24 h-24 rounded-full border border-accent/20 flex items-center justify-center relative">
-                    <div className="absolute inset-0 rounded-full border border-accent/40 animate-ping opacity-50" />
-                    <div className="w-16 h-16 rounded-full border border-accent/40 flex items-center justify-center bg-accent/5">
-                      <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                        <Users className="w-5 h-5 text-accent animate-pulse" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <h3 className="font-bold text-foreground mb-3 text-center text-lg">Recherche de trajets...</h3>
-                <p className="text-[11px] text-accent font-bold text-center px-4 leading-relaxed h-10 flex items-center justify-center">
-                  <motion.span key={searchLog} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
-                    {searchLog}
-                  </motion.span>
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="found"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass rounded-3xl border border-accent/30 relative overflow-hidden shadow-2xl shadow-accent/20"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-3xl -mr-10 -mt-10" />
-                <div className="p-5 relative z-10">
-                  <div className="flex justify-between items-start mb-5">
-                    <div className="flex gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center shrink-0 shadow-lg shadow-accent/40">
-                        <Car className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-extrabold text-foreground mb-1 text-base leading-tight">Toyota Prius</p>
-                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded-md inline-flex">
-                          <Star className="w-3 h-3 fill-accent" />
-                          <span>4.9 (Chauffeur Ali)</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-black text-2xl text-accent leading-none mb-1">${Math.round(calculatePrice(2))}</p>
-                      <p className="text-[10px] text-foreground font-bold bg-white/10 px-1.5 py-0.5 rounded">ÉCONOMIE 40%</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-secondary/40 rounded-2xl p-4 mb-5 border border-white/5 backdrop-blur-sm">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Disponibilité à bord</span>
-                      <span className="text-xs font-bold text-accent px-2 py-0.5 bg-accent/10 rounded-full">1 PLACE RESTANTE / 4</span>
-                    </div>
-                    <div className="flex gap-2">
-                       <div className="flex-1 h-2.5 rounded-full bg-gradient-to-r from-accent to-accent/80 shadow-sm" />
-                       <div className="flex-1 h-2.5 rounded-full bg-gradient-to-r from-accent to-accent/80 shadow-sm" />
-                       <div className="flex-1 h-2.5 rounded-full bg-gradient-to-r from-accent to-accent/80 shadow-sm relative"><div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[8px] font-black tracking-widest text-accent bg-accent/10 px-1 py-0.5 rounded uppercase whitespace-nowrap">Priorité</div></div>
-                       <div className="flex-1 h-2.5 rounded-full bg-black/20 dark:bg-white/10" />
-                    </div>
-                    <div className="flex justify-between mt-5 pt-4 border-t border-white/5 relative">
-                      <div className="flex flex-col items-center">
-                        <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center mb-1.5">
-                          <MapPin className="w-3 h-3 text-accent" />
-                        </div>
-                        <span className="text-[9px] text-muted-foreground font-bold">RAYON D'APPROCHE</span>
-                        <span className="text-[11px] font-extrabold text-foreground">&gt; 50m</span>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center mb-1.5">
-                          <Navigation className="w-3 h-3 text-accent" />
-                        </div>
-                        <span className="text-[9px] text-muted-foreground font-bold">COMPATIBILITÉ</span>
-                        <span className="text-[11px] font-extrabold text-foreground text-accent">Route 100%</span>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center mb-1.5">
-                          <Clock className="w-3 h-3 text-accent" />
-                        </div>
-                        <span className="text-[9px] text-muted-foreground font-bold">PASSAGE DANS</span>
-                        <span className="text-[11px] font-extrabold text-foreground">3 min</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <button
-                     onClick={() => {
-                       setSelectedVehicle('shared');
-                       setStep('confirm');
-                     }}
-                     className="w-full py-4 rounded-2xl relative overflow-hidden group"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent/80 transition-transform group-hover:scale-[1.02]" />
-                    <span className="relative z-10 text-white font-extrabold text-base tracking-wide flex items-center justify-center gap-2">
-                       <Users className="w-5 h-5" />
-                       Réserver cette place
-                    </span>
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {sharedState === 'found' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 bg-accent/5 border border-accent/20 rounded-xl p-3 flex gap-3 text-[11px] text-muted-foreground leading-relaxed font-medium">
-              <Sparkles className="w-5 h-5 text-accent shrink-0" />
-              <p>
-                <strong>Exécution de l'algorithme :</strong> Le système a détecté de multiples taxis à plus de 50m. Il a <strong>automatiquement favorisé celui avec 3 clients à bord</strong> pour maximiser le remplissage et optimiser l'écologie !
-              </p>
-            </motion.div>
-          )}
-        </motion.div>
-      )}
-
-      {step === 'confirm' && selectedVT && (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="px-6 space-y-4">
-          <div className="rounded-2xl overflow-hidden border border-border h-[180px]">
-            <WegoMap
-              markers={addressMarkers}
-              routePoints={routePoints}
-            />
-          </div>
-          
-          <div className="glass rounded-2xl p-5 border border-white/5">
-            <h3 className="font-bold text-foreground text-lg mb-5 border-b border-white/10 pb-3">{t('user.booking.priceSummary')}</h3>
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="w-2 h-2 rounded-full bg-accent2" />
-                  <span className="text-muted-foreground font-medium">{t('user.booking.pickup')}</span>
-                </div>
-                <span className="text-foreground text-right font-bold line-clamp-1">{pickup}</span>
-              </div>
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="w-2 h-2 rounded-full bg-accent" />
-                  <span className="text-muted-foreground font-medium">{t('user.booking.destination')}</span>
-                </div>
-                <span className="text-foreground text-right font-bold line-clamp-1">{destination}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground font-medium">{bookingType === 'shared' ? 'Mode' : t('user.booking.chooseVehicle')}</span>
-                <span className="text-foreground font-bold">{selectedVT.icon} {selectedVT.label}</span>
-              </div>
-              
-              <div className="pt-4 mt-2 border-t border-white/10 flex justify-between items-end">
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{t('user.booking.total')} ({distanceKm.toFixed(1)} km)</p>
-                  <p className="font-extrabold text-3xl text-gradient">${calculatePrice(selectedVT.price)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-accent font-bold mb-1">{t('user.booking.eta')}</p>
-                  <p className="text-sm text-foreground font-bold">
-                    {Math.ceil(durationMin * (selectedVT.label === 'Moto' ? 0.9 : 1.0))} min
-                  </p>
-                </div>
               </div>
             </div>
-          </div>
-          <button
-            onClick={handleConfirm}
-            className="w-full py-5 rounded-2xl gradient-accent text-accent-foreground font-extrabold text-lg tap-target shadow-xl shadow-accent/40 active:scale-[0.98] transition-all"
-          >
-            {t('user.booking.confirmBooking')}
-          </button>
-        </motion.div>
-      )}
+
+            <div className="pb-8">
+              <button
+                onClick={handleConfirm}
+                className="w-full py-6 rounded-[28px] gradient-accent text-white font-black text-lg uppercase tracking-widest tap-target shadow-[0_20px_50px_-10px_rgba(230,32,87,0.5)] active:scale-[0.98] transition-all relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-white/10 scale-0 group-hover:scale-110 transition-transform origin-center blur-2xl" />
+                <span className="relative z-10">{t('user.booking.confirmBooking')}</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      {/* ── Navigation Bottom Padding ── */}
+      <div className="h-20" />
     </div>
   );
 };

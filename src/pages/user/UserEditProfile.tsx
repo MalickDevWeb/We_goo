@@ -79,7 +79,7 @@ const UserEditProfile = () => {
   };
 
   return (
-    <div className="h-full bg-background relative overflow-hidden flex flex-col safe-top">
+    <div className="fixed inset-0 bg-background overflow-hidden flex flex-col safe-top z-[100]">
       {/* Background elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent/15 rounded-full blur-[120px] animate-pulse" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent2/10 rounded-full blur-[120px]" />
@@ -138,7 +138,7 @@ const UserEditProfile = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSave} className="space-y-4 flex-1 flex flex-col justify-between overflow-y-auto no-scrollbar">
+          <form onSubmit={handleSave} className="space-y-4 flex-1 flex flex-col justify-between overflow-hidden">
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold text-white/50 ml-1 uppercase tracking-widest">{t('user.profile.name')}</label>

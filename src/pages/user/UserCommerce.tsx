@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import * as api from '@/services/api';
 import type { OrderItem, Order } from '@/types/index';
+import LocationSearchInput from '@/components/LocationSearchInput';
 
 interface Product {
   id: string;
@@ -417,10 +418,14 @@ const UserCommerce = () => {
                     <h2 className="text-2xl font-black text-white">Livraison</h2>
                   </div>
                   <div className="space-y-6">
-                    <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-accent">Adresse</p>
-                      <input type="text" value={deliveryAddress} onChange={e => setDeliveryAddress(e.target.value)} aria-label="Adresse" title="Adresse" placeholder="Adresse" className="w-full bg-transparent text-lg font-bold text-white outline-none border-b border-white/10 pb-2 focus:border-accent" />
-                    </div>
+                    <LocationSearchInput
+                      label="Adresse de réception"
+                      value={deliveryAddress}
+                      onChange={setDeliveryAddress}
+                      onSelect={(displayName) => setDeliveryAddress(displayName)}
+                      placeholder="Où livrer ?"
+                      showCurrentLocation={true}
+                    />
                   </div>
                   <button onClick={() => setCheckoutStep('payment')} className="w-full py-5 rounded-3xl bg-white text-black font-black uppercase tracking-widest text-xs">Suivant</button>
                 </div>

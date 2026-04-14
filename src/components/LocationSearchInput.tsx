@@ -105,6 +105,8 @@ const LocationSearchInput = ({
             type="button"
             onClick={() => { onChange(''); setSuggestions([]); onSelect(''); }} 
             className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/40 hover:text-foreground transition-colors"
+            aria-label="Effacer"
+            title="Effacer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -117,7 +119,7 @@ const LocationSearchInput = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute left-0 right-0 mt-3 bg-card/95 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-2xl overflow-y-auto max-h-[280px] z-[2000] ring-1 ring-black/50"
+            className="absolute left-0 right-0 mt-3 bg-card/95 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-2xl overflow-y-auto max-h-[280px] z-[2005] ring-1 ring-black/50"
           >
             {loading ? (
               <div className="p-8 flex flex-col items-center gap-3">

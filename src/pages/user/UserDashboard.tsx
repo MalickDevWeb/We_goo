@@ -150,7 +150,7 @@ const UserDashboard = () => {
             <div className="relative overflow-hidden rounded-[32px] h-[180px] group">
               {/* Dynamic Map Background */}
               <div className="absolute inset-0 z-0">
-                <WegoMap markers={[]} center={[4.3857, 18.5562]} zoom={14} variant="dark" className="w-full h-full" />
+                <WegoMap markers={[]} zoom={14} variant="dark" className="w-full h-full" />
                 <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/40 to-transparent" />
                 <div className="absolute inset-0 backdrop-blur-[1px] group-hover:backdrop-blur-none transition-all duration-700" />
               </div>

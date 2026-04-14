@@ -4,13 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Search, ShoppingBag, Filter, Star, 
   MapPin, ShoppingCart, Heart, Bell, Zap, X, ChevronRight,
-  Utensils, CheckCircle2, Shield, Clock, Timer, Flame, Plus
+  Utensils, CheckCircle2, Shield, Clock, Timer, Flame, Plus, Minus, Loader2, Sparkles, Navigation
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import * as api from '@/services/api';
 import type { OrderItem, Order } from '@/types/index';
+import LocationSearchInput from '@/components/LocationSearchInput';
 
 interface FoodItem {
   id: string;
@@ -312,10 +313,14 @@ const UserRestaurants = () => {
               ) : checkoutStep === 'address' ? (
                 <div className="space-y-8 animate-in slide-in-from-right duration-300">
                   <div className="flex items-center gap-4"><button onClick={() => setCheckoutStep('idle')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white"><ArrowLeft className="w-5 h-5"/></button><h2 className="text-2xl font-black text-white">Livraison</h2></div>
-                  <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-accent">Adresse de réception</p>
-                    <input type="text" value={deliveryAddress} onChange={e => setDeliveryAddress(e.target.value)} aria-label="Adresse" title="Adresse" placeholder="Adresse" className="w-full bg-transparent text-lg font-bold text-white outline-none border-b border-white/10 pb-2 focus:border-accent" />
-                  </div>
+                  <LocationSearchInput
+                    label="Adresse de réception"
+                    value={deliveryAddress}
+                    onChange={setDeliveryAddress}
+                    onSelect={(displayName) => setDeliveryAddress(displayName)}
+                    placeholder="Où livrer ?"
+                    showCurrentLocation={true}
+                  />
                   <button onClick={() => setCheckoutStep('payment')} aria-label="Payer maintenant" className="w-full py-5 rounded-3xl bg-white text-black font-black uppercase tracking-[0.2em] text-xs">Suivant</button>
                 </div>
               ) : checkoutStep === 'payment' || checkoutStep === 'processing' ? (

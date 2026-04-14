@@ -7,7 +7,7 @@ import { changeLanguage } from '@/i18n';
 import i18n from '@/i18n';
 import type { User as UserType } from '@/types';
 import { motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as api from '@/services/api';
 
 const UserProfile = () => {
@@ -27,6 +27,30 @@ const UserProfile = () => {
     navigate('/');
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && session && profile) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const updatedUser = { ...profile, photo: reader.result as string } as UserType;
+          await api.updateUser(session.id, updatedUser);
+          setProfile(updatedUser);
+          toast.success(t('common.success'));
+        } catch (err) {
+          toast.error(t('common.error'));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   const toggleLang = () => {
     const next = i18n.language === 'es' ? 'fr' : 'es';
     changeLanguage(next);
@@ -34,23 +58,23 @@ const UserProfile = () => {
 
   const menuSections = [
     {
-      title: 'Compte',
+      title: t('user.profile.account'),
       items: [
-        { icon: User, label: 'Informations personnelles', color: 'text-accent', onClick: () => navigate('/user/profile/edit') },
-        { icon: Shield, label: 'Sécurité du Compte', color: 'text-green-500', onClick: () => navigate('/user/security') },
+        { icon: User, label: t('user.profile.personalInfo'), color: 'text-accent', onClick: () => navigate('/user/profile/edit') },
+        { icon: Shield, label: t('user.profile.security'), color: 'text-green-500', onClick: () => navigate('/user/security') },
       ]
     },
     {
-      title: 'Paramètres',
+      title: t('user.profile.preferences'),
       items: [
-        { icon: Globe, label: 'Préférences de Langue', rightLabel: i18n.language.toUpperCase(), onClick: toggleLang, color: 'text-blue-500' },
-        { icon: Bell, label: 'Notifications et Offres', color: 'text-orange-500', onClick: () => navigate('/user/notifications') },
+        { icon: Globe, label: t('user.profile.language'), rightLabel: i18n.language.toUpperCase(), onClick: toggleLang, color: 'text-blue-500' },
+        { icon: Bell, label: t('user.profile.notifications'), color: 'text-orange-500', onClick: () => navigate('/user/notifications') },
       ]
     },
     {
-      title: 'Assistance',
+      title: t('user.profile.support'),
       items: [
-        { icon: HelpCircle, label: 'Centre d\'aide 24/7', color: 'text-purple-500', onClick: () => navigate('/user/emergency') },
+        { icon: HelpCircle, label: t('user.profile.helpCenter'), color: 'text-purple-500', onClick: () => navigate('/user/emergency') },
       ]
     }
   ];
@@ -62,6 +86,16 @@ const UserProfile = () => {
         <div className="absolute -top-[100px] -left-[50px] w-[300px] h-[300px] bg-accent/30 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute top-[50px] -right-[50px] w-[250px] h-[250px] bg-accent2/20 rounded-full blur-[80px]" />
       </div>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageChange}
+        accept="image/*"
+        className="hidden"
+        title={t('user.profile.editPhoto')}
+        aria-label={t('user.profile.editPhoto')}
+      />
 
       <div className="relative z-10 safe-top px-6 pb-24 h-full overflow-y-auto no-scrollbar">
         {/* Header */}
@@ -81,8 +115,11 @@ const UserProfile = () => {
                   ) : (
                     <span className="text-3xl font-black text-accent">{user?.name?.charAt(0) || 'U'}</span>
                   )}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">Modifier photo</span>
+                  <div 
+                    className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                    onClick={triggerFileInput}
+                  >
+                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">{t('user.profile.editPhoto')}</span>
                   </div>
                 </div>
              </motion.div>
@@ -141,7 +178,7 @@ const UserProfile = () => {
           className="mt-12 w-full flex items-center justify-center gap-3 p-5 rounded-[28px] glass border border-destructive/10 text-destructive font-black text-sm active:scale-95 transition-all shadow-xl shadow-destructive/5 hover:bg-destructive/5"
         >
           <LogOut className="w-5 h-5" />
-          Déconnexion
+          {t('common.logout')}
         </motion.button>
       </div>
     </div>

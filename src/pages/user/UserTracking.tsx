@@ -300,12 +300,15 @@ const UserTracking = () => {
             </button>
           </div>
           
-          <button 
-            onClick={() => setShowCancelModal(true)}
-            className="w-full py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest hover:text-destructive transition-colors"
-          >
-            {t('user.tracking.cancel')}
-          </button>
+          {progress < 0.15 && (
+            <button 
+              onClick={() => setShowCancelModal(true)}
+              className="w-full mt-2 py-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive font-black text-sm active:scale-95 transition-all shadow-lg hover:bg-destructive/20 flex items-center justify-center gap-2"
+            >
+              <X className="w-5 h-5" />
+              {t('user.tracking.cancel')}
+            </button>
+          )}
         </div>
       </motion.div>
 
