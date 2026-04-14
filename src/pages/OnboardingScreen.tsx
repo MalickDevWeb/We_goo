@@ -33,12 +33,17 @@ const OnboardingScreen = () => {
     const intervalId = window.setInterval(() => {
       setCurrent((c) => (c + 1) % slides.length);
     }, 2000);
-    return () => window.clearInterval(intervalId);
+    return () => {
+      window.clearInterval(intervalId);
+      // Ensure any sound or video is stopped when leaving the page
+      document.querySelectorAll('audio').forEach(audio => audio.pause());
+      document.querySelectorAll('video').forEach(video => video.pause());
+    };
   }, []);
 
-  const handleContinue = () => navigate('/services');
+  const handleContinue = () => navigate('/permissions');
 
-  const handleSkip = () => navigate('/services');
+  const handleSkip = () => navigate('/permissions');
 
   const slide = slides[current];
   const bgSrc = encodeURI(`/images/wego/${slide.imageFile}`);

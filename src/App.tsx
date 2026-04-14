@@ -15,6 +15,7 @@ import LoginScreen from "@/pages/LoginScreen";
 import AdminLoginScreen from "@/pages/AdminLoginScreen";
 import BrandAssets from "@/pages/BrandAssets";
 import BlockedScreen from "@/pages/BlockedScreen";
+import PermissionsScreen from "@/pages/PermissionsScreen";
 
 import UserDashboard from "@/pages/user/UserDashboard";
 import UserBooking from "@/pages/user/UserBooking";
@@ -56,6 +57,7 @@ const App = () => (
           {/* Public */}
           <Route path="/" element={<SplashScreen />} />
           <Route path="/onboarding" element={<OnboardingScreen />} />
+          <Route path="/permissions" element={<PermissionsScreen />} />
           <Route path="/services" element={<ServicesScreen />} />
           <Route path="/services/:serviceKey" element={<ServiceDetailsScreen />} />
           <Route path="/login" element={<LoginScreen />} />
