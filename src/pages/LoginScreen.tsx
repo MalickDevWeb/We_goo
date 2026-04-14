@@ -21,6 +21,9 @@ const LoginScreen = () => {
       const redirectMap: Record<UserType, string> = {
         user: '/user/dashboard',
         driver: '/driver/dashboard',
+        restaurant: '/partner/restaurant',
+        hotel: '/partner/hotel',
+        rental: '/partner/rental',
         'admin-stand': '/admin-stand/dashboard',
         'super-admin': '/super-admin/dashboard',
       };

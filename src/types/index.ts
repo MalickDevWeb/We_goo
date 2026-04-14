@@ -1,4 +1,4 @@
-export type UserType = 'user' | 'driver' | 'admin-stand' | 'super-admin';
+export type UserType = 'user' | 'driver' | 'restaurant' | 'hotel' | 'rental' | 'admin-stand' | 'super-admin';
 
 export interface User {
   id: number;
@@ -38,6 +38,37 @@ export interface Driver {
   vehicleModel?: string;
   vehiclePlate?: string;
   createdAt?: string;
+}
+
+export interface Restaurant {
+  id: number;
+  userType: 'restaurant';
+  name: string;
+  ownerName: string;
+  phone: string;
+  email?: string;
+  photo?: string;
+  category: string;
+  rating: number;
+  totalOrders: number;
+  todayOrders: number;
+  todayEarnings: number;
+  isOnline: boolean;
+  walletBalance: number;
+  location: string;
+  openingHours: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  restaurantId: number;
+  available: boolean;
+  prepTime: string;
 }
 
 export type RideStatus = 'available' | 'accepted' | 'arriving' | 'in-progress' | 'completed' | 'cancelled';

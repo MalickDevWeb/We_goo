@@ -46,6 +46,13 @@ import DriverNotifications from "@/pages/driver/DriverNotifications";
 import DriverEmergency from "@/pages/driver/DriverEmergency";
 import DriverLayout from "@/components/DriverLayout";
 
+import RestaurantDashboard from "@/pages/business/RestaurantDashboard";
+import RestaurantMenu from "@/pages/business/RestaurantMenu";
+import RestaurantOrders from "@/pages/business/RestaurantOrders";
+import RestaurantWallet from "@/pages/business/RestaurantWallet";
+import RestaurantProfile from "@/pages/business/RestaurantProfile";
+import RestaurantLayout from "@/components/RestaurantLayout";
+
 import AdminStandDashboard from "@/pages/admin/AdminStandDashboard";
 import SuperAdminDashboard from "@/pages/admin/SuperAdminDashboard";
 
@@ -106,6 +113,15 @@ const App = () => (
           <Route path="/driver/profile/edit" element={<RequireAuth allowedRoles={['driver']}><DriverEditProfile /></RequireAuth>} />
           <Route path="/driver/emergency" element={<RequireAuth allowedRoles={['driver']}><DriverEmergency /></RequireAuth>} />
           <Route path="/driver/chat" element={<RequireAuth allowedRoles={['driver']}><UserChat /></RequireAuth>} />
+
+          {/* Restaurant Partner (with tab layout) */}
+          <Route path="/partner/restaurant" element={<RequireAuth allowedRoles={['restaurant']}><RestaurantLayout /></RequireAuth>}>
+            <Route index element={<RestaurantDashboard />} />
+            <Route path="menu" element={<RestaurantMenu />} />
+            <Route path="orders" element={<RestaurantOrders />} />
+            <Route path="wallet" element={<RestaurantWallet />} />
+            <Route path="profile" element={<RestaurantProfile />} />
+          </Route>
 
           {/* Admin Stand */}
           <Route path="/admin-stand/dashboard" element={<RequireAuth allowedRoles={['admin-stand']}><AdminStandDashboard /></RequireAuth>} />
