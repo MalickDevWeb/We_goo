@@ -31,10 +31,20 @@ const OnboardingScreen = () => {
   }, [session, navigate]);
 
   useEffect(() => {
-    // Attempt to play audio when component mounts
-    if (audioRef.current) {
+    // Only play audio if we are definitely staying on this page (no active session redirect)
+    if (audioRef.current && !session) {
       audioRef.current.play().catch(e => console.log('Audio autoplay blocked by browser:', e));
     }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        audioRef.current?.pause();
+      } else if (!session) {
+        audioRef.current?.play().catch(() => {});
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     const intervalId = window.setInterval(() => {
       setCurrent((c) => (c + 1) % slides.length);
@@ -42,13 +52,20 @@ const OnboardingScreen = () => {
 
     return () => {
       window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
       // Ensure the sound stops immediately when leaving the page
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
+      // Global safety fallback for any other audio elements
+      document.querySelectorAll('audio').forEach(a => {
+        a.pause();
+        a.currentTime = 0;
+      });
     };
-  }, []);
+  }, [session]);
 
   const handleContinue = () => navigate('/permissions');
 
