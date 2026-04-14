@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, MessageCircle, ArrowLeft, Navigation, ShieldCheck, MapPin, CheckCircle2, Play, Flag, X } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Phone, MessageCircle, ArrowLeft, Navigation, ShieldCheck, MapPin, CheckCircle2, Play, Flag, X, MoreHorizontal, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import WegoMap, { carIcon, pickupIcon, destinationIcon } from '@/components/WegoMap';
 import type { MapMarker } from '@/components/WegoMap';
 import * as api from '@/services/api';
@@ -118,57 +118,101 @@ const DriverTracking = () => {
         <WegoMap markers={markers} routePoints={route} routeColor="#e62057" center={driverPos} zoom={15} />
       </div>
 
-      <div className="absolute top-4 left-4 z-[1000] safe-top">
-        <button onClick={() => navigate('/user/dashboard')} className="w-12 h-12 rounded-full glass-strong flex items-center justify-center shadow-2xl border border-white/10 active:scale-90 transition-transform" aria-label={t('common.back')}>
+      <div className="absolute top-0 left-0 right-0 z-[1000] safe-top flex items-center justify-between px-4 pt-4">
+        <button 
+          onClick={() => navigate('/driver/dashboard')} 
+          className="w-12 h-12 rounded-full glass-strong flex items-center justify-center shadow-2xl border border-white/10 active:scale-90 transition-transform" 
+          aria-label={t('common.back')}
+        >
           <ArrowLeft className="w-6 h-6 text-foreground" />
         </button>
+
+        <div className="flex flex-col items-center">
+          <img src="/wego-logo.svg" alt="Wego" className="h-12 w-auto drop-shadow-lg" />
+        </div>
+
+        <div className="w-12 h-12 rounded-full glass-strong flex items-center justify-center border border-white/10 opacity-0 pointer-events-none">
+           <MoreHorizontal className="w-6 h-6" />
+        </div>
       </div>
 
       <motion.div 
-        initial={{ y: 300 }} animate={{ y: 0 }}
-        className="absolute bottom-0 left-0 right-0 glass-strong rounded-t-[40px] safe-bottom z-[1001] shadow-[0_-20px_60px_rgba(0,0,0,0.5)] border-t border-white/10 p-8"
+        initial={{ y: 500 }} 
+        animate={{ y: 0 }}
+        transition={{ type: 'spring', stiffness: 180, damping: 22 }}
+        className="absolute bottom-0 left-0 right-0 glass-strong rounded-t-[40px] safe-bottom z-[1001] shadow-[0_-20px_60px_rgba(0,0,0,0.5)] border-t border-white/10"
       >
-        <div className="w-12 h-1.5 rounded-full bg-white/20 mx-auto mb-6" />
+        <div className="w-12 h-1.5 rounded-full bg-white/20 mx-auto my-4" />
         
-        <div className="space-y-6">
+        <div className="px-8 pb-8 space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-accent/20 flex items-center justify-center overflow-hidden border-2 border-accent">
-                <span className="text-xl font-bold text-accent">{userName.split(' ').map(n => n[0]).join('')}</span>
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl bg-accent2/10 flex items-center justify-center overflow-hidden border border-accent2/30">
+                  <span className="text-xl font-black text-accent2">{userName.split(' ').map(n => n[0]).join('')}</span>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-accent2 border-2 border-background flex items-center justify-center">
+                  <ShieldCheck className="w-3 h-3 text-white" />
+                </div>
               </div>
               <div>
-                <h3 className="text-xl font-black text-foreground">{userName}</h3>
-                <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">{ride.status === 'in-progress' ? 'En viaje' : 'Punto de partida'}</p>
+                <h3 className="text-xl font-black text-white tracking-tight leading-tight">{userName}</h3>
+                <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-0.5">
+                  {ride.status === 'in-progress' ? 'Trajet en cours' : 'Passager à récupérer'}
+                </p>
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="w-12 h-12 rounded-2xl glass flex items-center justify-center text-accent" aria-label={t('user.tracking.call')}><Phone className="w-5 h-5" /></button>
-              <button className="w-12 h-12 rounded-2xl glass flex items-center justify-center text-accent2" aria-label={t('user.tracking.message')}><MessageCircle className="w-5 h-5" /></button>
+              <button 
+                onClick={() => {
+                  const message = encodeURIComponent(`Bonjour ${userName}, c'est votre chauffeur Wego.`);
+                  window.open(`https://wa.me/221770000000?text=${message}`, '_blank');
+                }}
+                className="w-14 h-14 rounded-2xl glass border border-white/10 flex items-center justify-center text-accent active:scale-90 transition-transform shadow-lg" 
+                aria-label={t('user.tracking.call')}
+              >
+                <Phone className="w-6 h-6" />
+              </button>
+              <button 
+                className="w-14 h-14 rounded-2xl glass border border-white/10 flex items-center justify-center text-accent2 active:scale-90 transition-transform shadow-lg" 
+                aria-label={t('user.tracking.message')}
+              >
+                <MessageCircle className="w-6 h-6" />
+              </button>
             </div>
           </div>
 
-          <div className="glass rounded-[28px] p-5 space-y-3">
+          {/* Route Details Glass Box */}
+          <div className="glass-strong rounded-[32px] p-6 space-y-5 border border-white/5 relative overflow-hidden bg-white/[0.02]">
+             <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-2xl -mr-12 -mt-12" />
+             
              <div className="flex items-start gap-4">
-                <div className="mt-1.5 w-2 h-2 rounded-full bg-accent ring-4 ring-accent/20" />
-                <div>
-                   <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Recogida</p>
-                   <p className="text-sm font-bold text-foreground line-clamp-1">{ride.from}</p>
+                <div className="w-8 h-8 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4 text-accent" />
+                </div>
+                <div className="min-w-0 flex-1">
+                   <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-0.5">Point de départ</p>
+                   <p className="text-sm font-black text-white truncate leading-tight">{ride.from}</p>
                 </div>
              </div>
-             <div className="ml-1 w-px h-6 bg-white/10" />
+             
+             <div className="ml-4 w-px h-4 bg-white/10" />
+             
              <div className="flex items-start gap-4">
-                <div className="mt-1.5 w-2 h-2 rounded-full bg-accent2 ring-4 ring-accent2/20" />
-                <div>
-                   <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Destino</p>
-                   <p className="text-sm font-bold text-foreground line-clamp-1">{ride.to}</p>
+                <div className="w-8 h-8 rounded-xl bg-accent2/20 flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4 text-accent2" />
+                </div>
+                <div className="min-w-0 flex-1">
+                   <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-0.5">Destination</p>
+                   <p className="text-sm font-black text-white truncate leading-tight">{ride.to}</p>
                 </div>
              </div>
           </div>
 
           <motion.button
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.96 }}
             onClick={updateStatus}
-            className={`w-full py-5 rounded-3xl ${action.color} text-white font-black text-lg shadow-2xl flex items-center justify-center gap-3 transition-colors`}
+            className={`w-full h-16 rounded-[24px] ${action.color} text-white font-black text-lg shadow-2xl shadow-accent/20 flex items-center justify-center gap-3 active:scale-95 transition-all uppercase tracking-widest`}
           >
             <action.icon className="w-6 h-6" />
             {action.label}
