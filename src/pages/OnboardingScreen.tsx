@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ const OnboardingScreen = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { session } = useAuthStore();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (session) {
@@ -30,14 +31,22 @@ const OnboardingScreen = () => {
   }, [session, navigate]);
 
   useEffect(() => {
+    // Attempt to play audio when component mounts
+    if (audioRef.current) {
+      audioRef.current.play().catch(e => console.log('Audio autoplay blocked by browser:', e));
+    }
+
     const intervalId = window.setInterval(() => {
       setCurrent((c) => (c + 1) % slides.length);
     }, 2000);
+
     return () => {
       window.clearInterval(intervalId);
-      // Ensure any sound or video is stopped when leaving the page
-      document.querySelectorAll('audio').forEach(audio => audio.pause());
-      document.querySelectorAll('video').forEach(video => video.pause());
+      // Ensure the sound stops immediately when leaving the page
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
   }, []);
 
@@ -50,6 +59,9 @@ const OnboardingScreen = () => {
 
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-background safe-top safe-bottom">
+      {/* Background Audio configured to play only here */}
+      <audio ref={audioRef} src="/audio/wego-onboarding.mp3" loop preload="auto" className="hidden" />
+
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
