@@ -1,8 +1,8 @@
-import type { User, Driver, Ride, Transaction, VehicleType, SavedPlace, Stand, AdminStand, SuperAdmin, PlatformStats, FeatureFlags, Settings } from '@/types';
+import type { User, Driver, Ride, Transaction, VehicleType, SavedPlace, Stand, AdminStand, SuperAdmin, PlatformStats, FeatureFlags, Settings, Merchant, Broadcast, SystemMetrics } from '@/types';
 import {
   mockUsers, mockDrivers, mockRides, mockTransactions, mockVehicleTypes,
   mockSavedPlaces, mockStands, mockAdminStands, mockSuperAdmins,
-  mockPlatformStats, mockFeatureFlags, mockSettings
+  mockPlatformStats, mockFeatureFlags, mockSettings, mockMerchants, mockBroadcasts
 } from './mockData';
 import type { Order } from '@/types/index';
 
@@ -31,6 +31,8 @@ const defaultDb = {
   platformStats: structuredClone(mockPlatformStats),
   featureFlags: structuredClone(mockFeatureFlags),
   settings: structuredClone(mockSettings),
+  merchants: structuredClone(mockMerchants),
+  broadcasts: structuredClone(mockBroadcasts),
 };
 
 const initialDb = (() => {
@@ -81,20 +83,20 @@ export const updateUser = wrapMutation(async (id: number, patch: Partial<User>):
 export const getDrivers = async (): Promise<Driver[]> => { await delay(); return db.drivers; };
 export const getDriverByPhone = async (phone: string): Promise<Driver | undefined> => { await delay(); return db.drivers.find(d => d.phone === phone); };
 export const getDriverById = async (id: number): Promise<Driver | undefined> => { await delay(); return db.drivers.find(d => d.id === id); };
-export const createDriver = async (data: Omit<Driver, 'id' | 'userType' | 'rating' | 'totalRides' | 'todayRides' | 'todayEarnings' | 'hoursWorked' | 'isOnline' | 'walletBalance'>): Promise<Driver> => {
+export const createDriver = wrapMutation(async (data: Omit<Driver, 'id' | 'userType' | 'rating' | 'totalRides' | 'todayRides' | 'todayEarnings' | 'hoursWorked' | 'isOnline' | 'walletBalance'>): Promise<Driver> => {
   await delay();
   const driver: Driver = { ...data, id: Date.now(), userType: 'driver', rating: 5, totalRides: 0, todayRides: 0, todayEarnings: 0, hoursWorked: 0, isOnline: false, walletBalance: 0, createdAt: new Date().toISOString() };
   db.drivers.push(driver);
   return driver;
-};
-export const updateDriver = async (id: number, patch: Partial<Driver>): Promise<Driver> => {
+});
+export const updateDriver = wrapMutation(async (id: number, patch: Partial<Driver>): Promise<Driver> => {
   await delay();
   const idx = db.drivers.findIndex(d => d.id === id);
   if (idx === -1) throw new Error('Driver not found');
   db.drivers[idx] = { ...db.drivers[idx], ...patch };
   return db.drivers[idx];
-};
-export const reportUser = async (userId: number, reason: string): Promise<void> => {
+});
+export const reportUser = wrapMutation(async (userId: number, reason: string): Promise<void> => {
   await delay();
   db.reports.push({ userId, reason, date: new Date().toISOString() });
   const user = db.users.find(u => u.id === userId);
@@ -104,7 +106,7 @@ export const reportUser = async (userId: number, reason: string): Promise<void> 
       user.blocked = true;
     }
   }
-};
+});
 
 // ─── Rides ───
 export const getRides = async (): Promise<Ride[]> => { await delay(); return db.rides; };
@@ -117,13 +119,13 @@ export const createRide = wrapMutation(async (data: Omit<Ride, 'id'>): Promise<R
   db.rides.push(ride);
   return ride;
 });
-export const updateRide = async (id: number, patch: Partial<Ride>): Promise<Ride> => {
+export const updateRide = wrapMutation(async (id: number, patch: Partial<Ride>): Promise<Ride> => {
   await delay();
   const idx = db.rides.findIndex(r => r.id === id);
   if (idx === -1) throw new Error('Ride not found');
   db.rides[idx] = { ...db.rides[idx], ...patch };
   return db.rides[idx];
-};
+});
 
 // ─── Transactions ───
 export const getTransactions = async (): Promise<Transaction[]> => { await delay(); return db.transactions; };
@@ -170,14 +172,76 @@ export const loginSuperAdmin = async (email: string, password: string): Promise<
 // ─── Platform ───
 export const getPlatformStats = async (): Promise<PlatformStats> => { await delay(); return db.platformStats; };
 export const getFeatureFlags = async (): Promise<FeatureFlags> => { await delay(); return db.featureFlags; };
-export const updateFeatureFlags = async (patch: Partial<FeatureFlags>): Promise<FeatureFlags> => {
+export const updateFeatureFlags = wrapMutation(async (patch: Partial<FeatureFlags>): Promise<FeatureFlags> => {
   await delay();
   Object.assign(db.featureFlags, patch);
   return db.featureFlags;
-};
+});
 export const getSettings = async (): Promise<Settings> => { await delay(); return db.settings; };
-export const updateSettings = async (patch: Partial<Settings>): Promise<Settings> => {
+export const updateSettings = wrapMutation(async (patch: Partial<Settings>): Promise<Settings> => {
   await delay();
   Object.assign(db.settings, patch);
   return db.settings;
+});
+
+// ─── Merchants ───
+export const getMerchants = async (): Promise<Merchant[]> => { await delay(); return db.merchants; };
+export const updateMerchant = wrapMutation(async (id: number, patch: Partial<Merchant>): Promise<Merchant> => {
+  await delay();
+  const idx = db.merchants.findIndex(m => m.id === id);
+  if (idx === -1) throw new Error('Merchant not found');
+  db.merchants[idx] = { ...db.merchants[idx], ...patch };
+  return db.merchants[idx];
+});
+
+// ─── Broadcasts ───
+export const getBroadcasts = async (): Promise<Broadcast[]> => { await delay(); return db.broadcasts; };
+export const createBroadcast = wrapMutation(async (data: Omit<Broadcast, 'id' | 'sentAt' | 'sentBy'>): Promise<Broadcast> => {
+  await delay();
+  const broadcast: Broadcast = {
+    ...data,
+    id: Date.now(),
+    sentAt: new Date().toISOString(),
+    sentBy: 'Super Admin'
+  };
+  db.broadcasts.unshift(broadcast);
+  return broadcast;
+});
+
+
+// ─── System Admin Advanced ───
+export const getSystemMetrics = async (): Promise<SystemMetrics> => {
+  await delay();
+  return {
+    cpuUsage: 25 + Math.random() * 15,
+    memoryUsage: 42 + Math.random() * 10,
+    activeRequests: Math.floor(800 + Math.random() * 400),
+    errorRate: 0.01 + Math.random() * 0.05,
+    uptime: '14d 6h 22m'
+  };
 };
+
+export const rebootNodes = wrapMutation(async (): Promise<void> => {
+  await delay(2000);
+  console.log('SYSTEM: All nodes rebooted successfully.');
+});
+
+export const adjustWallet = wrapMutation(async (userId: number, amount: number, reason: string): Promise<User> => {
+  await delay();
+  const user = db.users.find(u => u.id === userId);
+  if (!user) throw new Error('User not found');
+  
+  user.walletBalance += amount;
+  
+  db.transactions.unshift({
+    id: Date.now(),
+    userId,
+    type: amount >= 0 ? 'credit' : 'debit',
+    title: `Admin Adjustment: ${reason}`,
+    amount: Math.abs(amount),
+    date: new Date().toISOString(),
+    balance: user.walletBalance
+  });
+  
+  return user;
+});

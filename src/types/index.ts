@@ -88,6 +88,10 @@ export interface Ride {
   vehicleTypeId?: string;
   durationMin?: number;
   etaMin?: number;
+  receiverName?: string;
+  receiverPhone?: string;
+  pickupPin?: string;
+  deliveryOtp?: string;
 }
 
 export type TransactionType = 'credit' | 'debit';
@@ -191,3 +195,31 @@ export interface Order {
   address: string;
   category: string;
 }
+
+export interface Merchant {
+  id: number;
+  name: string;
+  type: 'Restaurant' | 'Hotel' | 'Commerce' | 'Logistics';
+  status: 'pending' | 'active' | 'suspended';
+  owner: string;
+  revenue: number;
+  joinedAt: string;
+  phone: string;
+}
+
+export interface Broadcast {
+  id: number;
+  message: string;
+  target: 'all' | 'user' | 'driver' | 'merchant';
+  sentAt: string;
+  sentBy: string;
+}
+
+export interface SystemMetrics {
+  cpuUsage: number;
+  memoryUsage: number;
+  activeRequests: number;
+  errorRate: number;
+  uptime: string;
+}
+

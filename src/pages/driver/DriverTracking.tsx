@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, MessageCircle, ArrowLeft, Navigation, ShieldCheck, MapPin, CheckCircle2, Play, Flag, X, MoreHorizontal, AlertTriangle } from 'lucide-react';
+import { Phone, MessageCircle, ArrowLeft, Navigation, ShieldCheck, MapPin, CheckCircle2, Play, Flag, X, MoreHorizontal, AlertTriangle, User, Truck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import WegoMap, { carIcon, pickupIcon, destinationIcon } from '@/components/WegoMap';
 import type { MapMarker } from '@/components/WegoMap';
@@ -145,7 +145,32 @@ const DriverTracking = () => {
         <div className="w-12 h-1.5 rounded-full bg-white/20 mx-auto my-4" />
         
         <div className="px-8 pb-8 space-y-6">
-          <div className="flex items-center justify-between">
+          {/* ── Status Link & Triple Interaction ── */}
+          <div className="flex items-center justify-between px-2 pb-2">
+             <div className="flex flex-col items-center gap-1.5">
+                <div className="w-9 h-9 rounded-full bg-accent/20 flex items-center justify-center border border-accent/30">
+                   <User className="w-4 h-4 text-accent" />
+                </div>
+                <span className="text-[7px] font-black text-white/40 uppercase tracking-widest truncate max-w-[50px]">{userName.split(' ')[0]}</span>
+             </div>
+             
+             <div className="flex-1 px-4 flex items-center gap-1">
+                <div className={`h-1 flex-1 rounded-full ${ride.status !== 'accepted' ? 'bg-accent shadow-[0_0_8px_rgba(230,32,87,0.5)]' : 'bg-white/10'}`} />
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${ride.status === 'in-progress' ? 'bg-accent/20 border-accent/30 animate-pulse' : (ride.status === 'completed' ? 'bg-accent2/20 border-accent2/30' : 'bg-white/5 border-white/5')}`}>
+                   <Truck className={`w-2.5 h-2.5 ${ride.status === 'in-progress' ? 'text-accent' : (ride.status === 'completed' ? 'text-accent2' : 'text-white/20')}`} />
+                </div>
+                <div className={`h-1 flex-1 rounded-full ${ride.status === 'completed' ? 'bg-accent2 shadow-[0_0_8px_rgba(30,192,255,0.5)]' : 'bg-white/10'}`} />
+             </div>
+
+             <div className="flex flex-col items-center gap-1.5">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center border ${ride.status === 'completed' ? 'bg-accent2/20 border-accent2/30' : 'bg-white/5 border-white/10'}`}>
+                   <User className={`w-4 h-4 ${ride.status === 'completed' ? 'text-accent2' : 'text-white/20'}`} />
+                </div>
+                <span className="text-[7px] font-black text-white/40 uppercase tracking-widest truncate max-w-[50px]">{ride.receiverName?.split(' ')[0] || 'Dest.'}</span>
+             </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 glass rounded-3xl border border-white/5">
             <div className="flex items-center gap-4">
               <div className="relative">
                 <div className="w-14 h-14 rounded-2xl bg-accent2/10 flex items-center justify-center overflow-hidden border border-accent2/30">
@@ -158,29 +183,56 @@ const DriverTracking = () => {
               <div>
                 <h3 className="text-xl font-black text-white tracking-tight leading-tight">{userName}</h3>
                 <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-0.5">
-                  {ride.status === 'in-progress' ? 'Trajet en cours' : 'Passager à récupérer'}
+                  {ride.status === 'in-progress' ? 'En livraison vers dest.' : (ride.status === 'accepted' || ride.status === 'arriving' ? 'Collecte chez expéditeur' : 'Terminé')}
                 </p>
               </div>
             </div>
             <div className="flex gap-2">
               <button 
                 onClick={() => {
-                  const message = encodeURIComponent(`Bonjour ${userName}, c'est votre chauffeur Wego.`);
+                  const message = encodeURIComponent(`Bonjour, c'est votre chauffeur Wego pour le colis.`);
                   window.open(`https://wa.me/221770000000?text=${message}`, '_blank');
                 }}
-                className="w-14 h-14 rounded-2xl glass border border-white/10 flex items-center justify-center text-accent active:scale-90 transition-transform shadow-lg" 
+                className="w-12 h-12 rounded-2xl glass border border-white/10 flex items-center justify-center text-accent active:scale-90 transition-transform shadow-lg" 
                 aria-label={t('user.tracking.call')}
               >
-                <Phone className="w-6 h-6" />
+                <Phone className="w-5 h-5" />
               </button>
               <button 
-                className="w-14 h-14 rounded-2xl glass border border-white/10 flex items-center justify-center text-accent2 active:scale-90 transition-transform shadow-lg" 
+                className="w-12 h-12 rounded-2xl glass border border-white/10 flex items-center justify-center text-accent2 active:scale-90 transition-transform shadow-lg" 
                 aria-label={t('user.tracking.message')}
               >
-                <MessageCircle className="w-6 h-6" />
+                <MessageCircle className="w-5 h-5" />
               </button>
             </div>
           </div>
+
+          {/* Receiver Info Section (Conditional) */}
+          {(ride.status === 'in-progress' || ride.status === 'completed') && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="p-4 glass rounded-3xl border-2 border-accent2/20 bg-accent2/5 flex items-center justify-between"
+            >
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-accent2/20 flex items-center justify-center border border-accent2/30">
+                     <User className="w-6 h-6 text-accent2" />
+                  </div>
+                  <div>
+                     <p className="text-[8px] font-black text-accent2 uppercase tracking-widest mb-0.5">Contact Final (Destinataire)</p>
+                     <h4 className="text-sm font-black text-white">{ride.receiverName || 'Chargement...'}</h4>
+                     <p className="text-[10px] font-bold text-white/40">{ride.receiverPhone || '---'}</p>
+                  </div>
+               </div>
+               <button 
+                 title="Contacter le destinataire"
+                 aria-label="Contacter le destinataire"
+                 className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-accent2 transition-colors"
+               >
+                 <MessageCircle className="w-5 h-5" />
+               </button>
+            </motion.div>
+          )}
 
           {/* Route Details Glass Box */}
           <div className="glass-strong rounded-[32px] p-6 space-y-5 border border-white/5 relative overflow-hidden bg-white/[0.02]">

@@ -1,4 +1,4 @@
-import type { User, Driver, Ride, Transaction, VehicleType, SavedPlace, Stand, AdminStand, SuperAdmin, PlatformStats, FeatureFlags, Settings } from '@/types';
+import type { User, Driver, Ride, Transaction, VehicleType, SavedPlace, Stand, AdminStand, SuperAdmin, PlatformStats, FeatureFlags, Settings, Merchant, Broadcast } from '@/types';
 
 export const mockUsers: User[] = [
   { id: 1, userType: 'user', name: 'María López', phone: '+5491155001234', walletBalance: 2500, totalRides: 12, totalSpent: 3400, createdAt: '2025-01-15' },
@@ -8,8 +8,8 @@ export const mockUsers: User[] = [
 ];
 
 export const mockDrivers: Driver[] = [
-  { id: 1, userType: 'driver', name: 'Roberto Sánchez', phone: '+5491155001234', rating: 4.8, totalRides: 230, todayRides: 5, todayEarnings: 1200, hoursWorked: 6, isOnline: true, walletBalance: 3500, debt: 200, licenseNumber: 'LIC-001', vehicleBrand: 'Toyota', vehicleModel: 'Corolla', licensePlate: 'ABC-123', createdAt: '2024-06-01' },
-  { id: 2, userType: 'driver', name: 'Luis Martínez', phone: '+5491155008888', rating: 4.5, totalRides: 150, todayRides: 3, todayEarnings: 800, hoursWorked: 4, isOnline: false, walletBalance: 1200, licenseNumber: 'LIC-002', vehicleBrand: 'Honda', vehicleModel: 'Civic', licensePlate: 'DEF-456', createdAt: '2024-08-15' },
+  { id: 1, userType: 'driver', name: 'Roberto Sánchez', phone: '+5491155001234', rating: 4.8, totalRides: 230, todayRides: 5, todayEarnings: 1200, hoursWorked: 6, isOnline: true, walletBalance: 3500, debt: 200, licenseNumber: 'LIC-001', vehicleBrand: 'Toyota', vehicleModel: 'Corolla', vehiclePlate: 'ABC-123', createdAt: '2024-06-01' },
+  { id: 2, userType: 'driver', name: 'Luis Martínez', phone: '+5491155008888', rating: 4.5, totalRides: 150, todayRides: 3, todayEarnings: 800, hoursWorked: 4, isOnline: false, walletBalance: 1200, licenseNumber: 'LIC-002', vehicleBrand: 'Honda', vehicleModel: 'Civic', vehiclePlate: 'DEF-456', createdAt: '2024-08-15' },
   { id: 3, userType: 'driver', name: 'Jorge Méndez', phone: '+5491155007777', rating: 4.9, totalRides: 310, todayRides: 8, todayEarnings: 2100, hoursWorked: 9, isOnline: true, walletBalance: 5000, debt: 0, licenseNumber: 'LIC-003', createdAt: '2024-03-10' },
 ];
 
@@ -79,3 +79,15 @@ export const mockSettings: Settings = {
   termsUrl: 'https://wego.app/terms',
   privacyUrl: 'https://wego.app/privacy',
 };
+
+export const mockMerchants: Merchant[] = [
+  { id: 1, name: 'Le Gourmet Plateau', type: 'Restaurant', status: 'pending', revenue: 0, owner: 'Jean K.', phone: '+225 01010101', joinedAt: '2025-04-10' },
+  { id: 2, name: 'Hotel de Ville', type: 'Hotel', status: 'active', revenue: 1200000, owner: 'Sarah M.', phone: '+225 02020202', joinedAt: '2025-03-15' },
+  { id: 3, name: 'Wego Express Shop', type: 'Commerce', status: 'active', revenue: 450000, owner: 'System', phone: '+225 03030303', joinedAt: '2025-01-20' },
+];
+
+export const mockBroadcasts: Broadcast[] = [
+  { id: 1, message: 'Welcome to the Wego platform!', target: 'all', sentAt: '2025-04-01T10:00:00Z', sentBy: 'Super Admin' },
+  { id: 2, message: 'New driver incentives available.', target: 'driver', sentAt: '2025-04-05T14:30:00Z', sentBy: 'System' },
+];
+

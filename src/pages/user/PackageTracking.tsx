@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Package, CheckCircle2, Clock, Truck, MapPin,
   Phone, Star, ChevronDown, ChevronUp, ChevronRight, MessageCircle,
-  Shield, Copy, X, ShoppingBag, Zap
+  Shield, Copy, X, ShoppingBag, Zap, User
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -52,6 +52,7 @@ const PackageTracking = () => {
     pickupPin: '4321'
   };
   const [pkg, setPkg] = useState(pkgInitial);
+  const [showArrivalSim, setShowArrivalSim] = useState(false);
 
   // Map & movement state
   const [route, setRoute]         = useState<[number, number][]>([]);
@@ -153,6 +154,16 @@ const PackageTracking = () => {
     setPkg(prev => ({ ...prev, status: 'in-progress' }));
     setShowPickup(false);
     toast.success('Colis collecté avec succès !');
+    // After 3 seconds of movement, show arrival simulation option
+    setTimeout(() => setShowArrivalSim(true), 3000);
+  };
+
+  const simulateArrival = () => {
+    setPkg(prev => ({ ...prev, status: 'arriving' }));
+    setShowArrivalSim(false);
+    setShowOTP(true);
+    setProgress(0.95);
+    toast.info('Livreur arrivé à destination !');
   };
 
   const handleCancelPackage = async () => {
@@ -186,11 +197,17 @@ const PackageTracking = () => {
       </div>
 
       {/* ── Tracking badge ── */}
-      <div className="absolute top-4 right-4 z-[1000] safe-top">
+      <div className="absolute top-4 right-4 z-[1000] safe-top flex flex-col items-end gap-2">
         <div className="glass-strong rounded-2xl px-4 py-2 border border-white/10 shadow-lg">
           <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">N° suivi</p>
           <p className="text-xs font-black text-white tracking-wider">WG-{String(pkg?.id || 'PK1').slice(0,8).toUpperCase()}</p>
         </div>
+        {(pkg?.status === 'in-progress' || pkg?.status === 'arriving') && (
+          <div className="flex items-center gap-1.5 bg-accent/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-accent/30 shadow-lg shadow-accent/10">
+            <div className="w-1.5 h-1.5 bg-accent rounded-full animate-ping" />
+            <span className="text-[8px] font-black text-accent uppercase tracking-widest">Live Tracking</span>
+          </div>
+        )}
       </div>
 
       {/* ── Bottom Sheet ── */}
@@ -201,164 +218,157 @@ const PackageTracking = () => {
         className="flex-1 bg-[#0A0A0B] border-t border-white/10 rounded-t-[32px] relative z-[1000] flex flex-col overflow-hidden"
       >
         {/* Handle */}
-        <button
-          className="w-full flex flex-col items-center pt-3 pb-1 shrink-0 active:opacity-60"
-          onClick={() => setSheetExpanded(!sheetExpanded)}
-        >
-          <div className="w-10 h-1 rounded-full bg-white/20 mb-1" />
-          {sheetExpanded
-            ? <ChevronDown className="w-4 h-4 text-white/30" />
-            : <ChevronUp   className="w-4 h-4 text-white/30" />
-          }
-        </button>
+        <div className="flex-1 overflow-y-auto no-scrollbar px-5 pb-6 space-y-4 pt-1">
 
-        <div className="flex-1 overflow-y-auto no-scrollbar px-5 pb-6 space-y-3 pt-1">
-
-          {/* ── Pickup validation for sender (MOVED TO TOP FOR VISIBILITY) ── */}
-          {pkg?.status === 'accepted' && (
-            <motion.div 
-               initial={{ scale: 0.95, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1 }}
-               className={`glass rounded-[24px] border-2 ${showPickup ? 'border-accent shadow-[0_0_30px_rgba(230,32,87,0.2)] bg-accent/5' : 'border-accent/20 bg-accent/5'} overflow-hidden transition-all duration-500 mb-4`}
-            >
-              <button
-                onClick={() => setShowPickup(!showPickup)}
-                className="w-full p-5 flex items-center justify-between active:bg-white/5 transition-all"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center relative shadow-lg shadow-accent/20">
-                    <Package className="w-6 h-6 text-white" />
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                       <div className="w-2 h-2 bg-accent rounded-full animate-ping" />
-                    </div>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[10px] font-black text-accent uppercase tracking-[0.2em] animate-pulse">Action Requise</p>
-                    <p className="text-base font-black text-white">Confirmer le Ramassage</p>
-                  </div>
+          {/* ── Triple-Actor Status Link ── */}
+          <div className="glass-strong rounded-[24px] p-4 border border-white/5 relative overflow-hidden bg-white/[0.02]">
+             <div className="flex items-center justify-between relative z-10 px-2">
+                <div className="flex flex-col items-center gap-2">
+                   <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center border border-accent/30 shadow-lg shadow-accent/10">
+                      <User className="w-5 h-5 text-accent" />
+                   </div>
+                   <span className="text-[8px] font-black text-white/40 uppercase tracking-widest">{pkg?.senderName?.split(' ')[0] || 'Vous'}</span>
                 </div>
-                {showPickup ? <ChevronDown className="w-5 h-5 text-white/30" /> : <ChevronRight className="w-5 h-5 text-white/30" />}
-              </button>
-              
-              <AnimatePresence>
-                {showPickup && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="px-5 pb-8 flex flex-col items-center"
-                  >
-                    <div className="w-full h-px bg-white/10 mb-6" />
-                    
-                    <div className="relative group mb-8">
-                      <div className="absolute -inset-6 bg-accent/30 rounded-full blur-[40px] opacity-50 group-hover:opacity-100 transition-opacity" />
-                      <div className="w-48 h-48 bg-white rounded-[32px] flex items-center justify-center p-4 shadow-2xl relative transition-transform hover:scale-105">
-                         <img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=000000&bgcolor=ffffff&data=PICKUP-${pkg?.id}`} alt="QR Code Collecte" className="w-full h-full" />
-                         <div className="absolute -bottom-3 inset-x-4 h-8 bg-accent rounded-xl flex items-center justify-center text-[10px] font-black text-white uppercase tracking-widest shadow-xl shadow-accent/40 border border-white/20">
-                           QR Code de Collecte
+
+                <div className="flex-1 px-2 flex items-center gap-1 group">
+                   <div className={`h-1 flex-1 rounded-full transition-all duration-1000 ${pkg?.status !== 'accepted' ? 'bg-accent shadow-[0_0_10px_rgba(230,32,87,0.5)]' : 'bg-white/10'}`} />
+                   <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border transition-all duration-1000 ${progress > 0 ? 'bg-accent/20 border-accent/30 animate-pulse' : 'bg-white/5 border-white/5'}`}>
+                      <Truck className={`w-3 h-3 ${progress > 0 ? 'text-accent' : 'text-white/20'}`} />
+                   </div>
+                   <div className={`h-1 flex-1 rounded-full transition-all duration-1000 ${pkg?.status === 'delivered' ? 'bg-accent2 shadow-[0_0_10px_rgba(30,192,255,0.5)]' : 'bg-white/10'}`} />
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-1000 ${pkg?.status === 'delivered' ? 'bg-accent2/20 border-accent2/30 shadow-lg shadow-accent2/20' : 'bg-white/5 border-white/10'}`}>
+                      <User className={`w-5 h-5 ${pkg?.status === 'delivered' ? 'text-accent2' : 'text-white/20'}`} />
+                   </div>
+                   <span className="text-[8px] font-black text-white/40 uppercase tracking-widest">{pkg?.receiverName?.split(' ')[0] || 'Dest.'}</span>
+                </div>
+             </div>
+             
+             <div className="mt-4 flex justify-center">
+                <div className="bg-white/5 px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
+                   <Shield className="w-3 h-3 text-accent2" />
+                   <span className="text-[8px] font-black text-white/60 uppercase tracking-tighter">Validation Triple : Actif</span>
+                </div>
+             </div>
+          </div>
+
+          {/* ── Security Center (Consolidated Validations) ── */}
+          <div className="glass-strong rounded-[28px] border border-white/10 overflow-hidden bg-white/[0.02]">
+             <div className="p-4 border-b border-white/5 bg-accent/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                   <Shield className="w-4 h-4 text-accent" />
+                   <span className="text-[10px] font-black text-white uppercase tracking-widest">Centre de Sécurité</span>
+                </div>
+                <div className="flex gap-1">
+                   <div className={`w-1.5 h-1.5 rounded-full transition-colors ${pkg?.status === 'accepted' ? 'bg-accent animate-pulse' : 'bg-emerald-500'}`} />
+                   <div className={`w-1.5 h-1.5 rounded-full transition-colors ${pkg?.status === 'arriving' ? 'bg-accent2 animate-pulse' : (pkg?.status === 'delivered' ? 'bg-emerald-500' : 'bg-white/10')}`} />
+                </div>
+             </div>
+             
+             <div className="p-4 space-y-4">
+                {/* Pickup Phase */}
+                <div className={`p-4 rounded-2xl border transition-all ${pkg?.status === 'accepted' ? 'bg-accent/10 border-accent/40 shadow-lg shadow-accent/10' : 'bg-white/5 border-white/5 opacity-50'}`}>
+                   <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                         <div className="w-6 h-6 rounded-lg bg-accent/20 flex items-center justify-center">
+                            <Package className="w-3.5 h-3.5 text-accent" />
                          </div>
+                         <span className="text-[10px] font-black text-white uppercase tracking-tighter">Étape 1 : Collecte</span>
                       </div>
-                    </div>
-
-                    <div className="w-full bg-black/20 rounded-[24px] p-4 border border-white/5 flex flex-col items-center mb-6">
-                      <p className="text-[9px] text-white/40 uppercase tracking-[0.3em] font-black mb-3 italic">OU DONNER LE CODE PIN</p>
-                      <div className="flex items-center gap-4">
-                        <p className="text-[40px] font-black text-accent tracking-[0.3em] font-mono">{PICKUP_PIN}</p>
-                        <button 
-                          onClick={handleCopyOTP} 
-                          className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center text-accent hover:bg-accent hover:text-white transition-all border border-accent/20"
-                          title="Copier le code PIN"
-                          aria-label="Copier le code PIN"
-                        >
-                          <Copy className="w-5 h-5" />
-                        </button>
+                      {pkg?.status !== 'accepted' && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                   </div>
+                   {pkg?.status === 'accepted' && (
+                      <div className="flex items-center gap-3">
+                         <div className="flex-1 bg-black/40 rounded-xl p-3 border border-white/5">
+                            <p className="text-[8px] text-white/40 uppercase mb-1">PIN de Collecte</p>
+                            <p className="text-xl font-black text-accent tracking-[0.2em] font-mono">{PICKUP_PIN}</p>
+                         </div>
+                         <button onClick={simulatePickup} className="px-4 py-3 rounded-xl bg-accent text-white font-black text-[9px] uppercase tracking-widest shadow-lg shadow-accent/20 active:scale-95 transition-all">Simuler Scan</button>
                       </div>
-                    </div>
+                   )}
+                </div>
 
-                    <button 
-                      onClick={simulatePickup}
-                      className="w-full py-4 rounded-2xl gradient-accent text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-accent/30 active:scale-[0.98] transition-all relative overflow-hidden group"
-                    >
-                      <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 group-hover:h-full transition-all duration-300 opacity-20" />
-                      <span className="relative z-10">Simuler Scan Livreur (Collecte)</span>
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          )}
-
-          {/* ── ETA card ── */}
-          <div className="glass rounded-[20px] p-4 flex items-center justify-between border border-white/5">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-accent2/10 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-accent2" />
-              </div>
-              <div>
-                <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Arrivée estimée</p>
-                {pkg?.status === 'delivered' || progress >= 1
-                  ? <p className="text-xl font-black text-accent2 flex items-center gap-2">Colis Livré <CheckCircle2 className="w-5 h-5" /></p>
-                  : <p className="text-2xl font-black text-white tabular-nums">~{etaMin} <span className="text-sm text-white/40">min</span></p>
-                }
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Restant</p>
-              <p className="text-sm font-black text-white">{pkg?.status === 'delivered' ? '0' : remainingDist.toFixed(1)} km</p>
-            </div>
+                {/* Delivery Phase */}
+                <div className={`p-4 rounded-2xl border transition-all ${pkg?.status === 'arriving' || pkg?.status === 'in-progress' ? 'bg-accent2/10 border-accent2/40' : (pkg?.status === 'delivered' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-white/5 border-white/5 opacity-40')}`}>
+                   <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                         <div className="w-6 h-6 rounded-lg bg-accent2/20 flex items-center justify-center">
+                            <MapPin className="w-3.5 h-3.5 text-accent2" />
+                         </div>
+                         <span className="text-[10px] font-black text-white uppercase tracking-tighter">Étape 2 : Livraison</span>
+                      </div>
+                      {pkg?.status === 'delivered' && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                   </div>
+                   {(pkg?.status === 'arriving' || pkg?.status === 'in-progress') && (
+                      <div className="flex items-center gap-3">
+                         <div className="flex-1 bg-black/40 rounded-xl p-3 border border-white/5">
+                            <p className="text-[8px] text-white/40 uppercase mb-1">OTP de Réception</p>
+                            <p className="text-xl font-black text-accent2 tracking-[0.2em] font-mono">{OTP_CODE}</p>
+                         </div>
+                         {pkg?.status === 'arriving' && (
+                            <button onClick={simulateDelivery} className="px-4 py-3 rounded-xl bg-accent2 text-white font-black text-[9px] uppercase tracking-widest shadow-lg shadow-accent2/20 active:scale-95 transition-all">Simuler Scan</button>
+                         )}
+                      </div>
+                   )}
+                </div>
+             </div>
           </div>
 
-          {/* ── Progress bar ── */}
-          <div className="glass rounded-[16px] p-3 border border-white/5">
-            <div className="flex justify-between text-[9px] font-black text-white/40 uppercase tracking-widest mb-2">
-              <span>Départ</span>
-              <span>{Math.round(progress * 100)}%</span>
-              <span>Arrivée</span>
-            </div>
-            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-accent to-accent2 rounded-full"
-                animate={{ width: `${progress * 100}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-          </div>
+          {/* ── Actors Row (Driver & Receiver) ── */}
+          <div className="grid grid-cols-2 gap-3">
+             {/* Driver Card */}
+             <div className="glass rounded-[24px] p-4 border border-white/5 flex flex-col gap-3 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-16 h-16 bg-accent/5 rounded-full -mr-8 -mt-8 blur-xl" />
+                <div className="flex items-center gap-3 relative z-10">
+                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/30 to-accent2/20 flex items-center justify-center border border-white/10 shrink-0 font-black text-white/40">
+                      {DRIVER.name.charAt(0)}
+                   </div>
+                   <div className="min-w-0">
+                      <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">Livreur</p>
+                      <p className="text-[11px] font-black text-white truncate">{DRIVER.name}</p>
+                   </div>
+                </div>
+                <div className="flex items-center justify-between pt-1 relative z-10">
+                   <div className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                      <span className="text-[10px] font-black text-white/60">{DRIVER.rating}</span>
+                   </div>
+                   <a 
+                     href={`tel:${DRIVER.phone}`} 
+                     title="Appeler le livreur"
+                     aria-label="Appeler le livreur"
+                     className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/40 hover:text-accent transition-colors"
+                   >
+                     <Phone className="w-4 h-4" />
+                   </a>
+                </div>
+             </div>
 
-          {/* ── Driver card ── */}
-          <div className="glass rounded-[24px] p-4 border border-white/5">
-            <p className="text-[9px] font-black text-white/40 uppercase tracking-widest mb-3">Livreur</p>
-            <div className="flex items-center gap-3">
-              {/* Avatar */}
-              <div className="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-accent/30 to-accent2/20 flex items-center justify-center border border-white/10 overflow-hidden shrink-0">
-                {DRIVER.photo
-                  ? <img src={DRIVER.photo} alt={DRIVER.name} className="w-full h-full object-cover" />
-                  : <span className="text-2xl font-black text-white/30">{DRIVER.name.charAt(0)}</span>
-                }
-              </div>
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <p className="text-sm font-black text-white truncate">{DRIVER.name}</p>
-                  {DRIVER.verified && <Shield className="w-3 h-3 text-accent2 shrink-0" />}
+             {/* Receiver Card */}
+             <div className="glass rounded-[24px] p-4 border border-white/5 flex flex-col gap-3 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-16 h-16 bg-accent2/5 rounded-full -mr-8 -mt-8 blur-xl" />
+                <div className="flex items-center gap-3 relative z-10">
+                   <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 shrink-0 font-black text-white/40">
+                      {pkg.receiverName?.charAt(0) || 'D'}
+                   </div>
+                   <div className="min-w-0">
+                      <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">Destinataire</p>
+                      <p className="text-[11px] font-black text-white truncate">{pkg.receiverName || 'En attente...'}</p>
+                   </div>
                 </div>
-                <p className="text-[10px] text-white/40 mb-1 truncate">{DRIVER.vehicle}</p>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                  <span className="text-[10px] font-black text-yellow-400">{DRIVER.rating}</span>
-                  <span className="text-[9px] text-white/30 ml-1">· {DRIVER.totalDeliveries} livraisons</span>
+                <div className="flex items-center justify-between pt-1 relative z-10">
+                   <span className="text-[10px] font-bold text-white/40 italic">{pkg.receiverPhone || '---'}</span>
+                   <button 
+                     title="Contacter le destinataire"
+                     aria-label="Contacter le destinataire"
+                     className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/40 hover:text-accent2 transition-colors"
+                   >
+                     <MessageCircle className="w-4 h-4" />
+                   </button>
                 </div>
-              </div>
-              {/* Actions */}
-              <div className="flex gap-2">
-                <a
-                  href={`tel:${DRIVER.phone}`}
-                  aria-label={`Appeler ${DRIVER.name}`}
-                  className="w-10 h-10 rounded-xl bg-accent2/10 border border-accent2/20 flex items-center justify-center active:scale-90 transition-all"
-                >
-                  <Phone className="w-4 h-4 text-accent2" />
-                </a>
-               </div>
-            </div>
+             </div>
           </div>
 
           {/* ── Chat button (below driver card) ── */}
@@ -448,7 +458,7 @@ const PackageTracking = () => {
                     >
                       <div className="w-full h-px bg-white/5 mb-4" />
                       <p className="text-[10px] text-center text-white/60 mb-5 px-4 font-medium leading-relaxed">
-                        À l'arrivée du chauffeur, présentez ce code ou faites scanner le QR Code pour valider la réception.
+                        Le destinataire peut présenter ce QR Code au livreur. S'il n'a pas l'application, il peut donner le code reçu par <b>SMS ou Email</b>.
                       </p>
                       
                       <div className="group relative">
@@ -456,7 +466,9 @@ const PackageTracking = () => {
                         <div className="w-40 h-40 bg-white rounded-[28px] flex items-center justify-center p-4 shadow-[0_20px_50px_rgba(230,32,87,0.3)] relative transition-transform hover:scale-105 active:scale-95 cursor-pointer">
                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=e62057&bgcolor=ffffff&data=WEGO-VALIDATE-${pkg?.id || 'PK1'}`} alt="QR Code validation" className="w-full h-full rounded-xl" />
                            <div className="absolute inset-x-0 -bottom-2 flex justify-center">
-                             <div className="bg-accent px-3 py-1 rounded-full text-[8px] font-black text-white uppercase tracking-tighter shadow-lg shadow-accent/40 border border-white/20">Scan Direct</div>
+                             <div className="bg-accent px-3 py-1 rounded-full text-[8px] font-black text-white uppercase tracking-tighter shadow-lg shadow-accent/40 border border-white/20 flex items-center gap-1">
+                               <Shield className="w-2.5 h-2.5" /> Scan Livreur
+                             </div>
                            </div>
                         </div>
                       </div>

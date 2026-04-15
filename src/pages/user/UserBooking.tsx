@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 import * as api from '@/services/api';
-import { getRealRoute, reverseGeocode, searchLocations } from '@/services/mapService';
+import { getRealRoute, reverseGeocode, searchLocations, type LocationSuggestion } from '@/services/mapService';
 import type { VehicleType, SavedPlace } from '@/types';
 import WegoMap, { pickupIcon, destinationIcon, type MapMarker } from '@/components/WegoMap';
 import LocationSearchInput from '@/components/LocationSearchInput';
@@ -184,7 +184,7 @@ const UserBooking = () => {
             </div>
 
             {/* ── Route Inputs ── */}
-            <div className="glass rounded-[32px] p-2 border border-white/5 relative bg-gradient-to-b from-white/5 to-transparent">
+            <div className="glass rounded-[32px] p-2 border border-white/5 relative bg-gradient-to-b from-white/5 to-transparent z-50 overflow-visible">
               <div className="p-4 space-y-4">
                 <LocationSearchInput
                   value={pickup}

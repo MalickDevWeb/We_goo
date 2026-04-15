@@ -13,6 +13,7 @@ interface LocationSearchInputProps {
   className?: string;
   label?: string;
   showCurrentLocation?: boolean;
+  suggestionsPosition?: 'top' | 'bottom';
 }
 
 const LocationSearchInput = ({ 
@@ -22,7 +23,8 @@ const LocationSearchInput = ({
   placeholder, 
   className = '', 
   label,
-  showCurrentLocation = false
+  showCurrentLocation = false,
+  suggestionsPosition = 'bottom'
 }: LocationSearchInputProps) => {
   const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
@@ -98,7 +100,7 @@ const LocationSearchInput = ({
           }}
           onFocus={() => setShowSuggestions(true)}
           placeholder={placeholder}
-          className="w-full bg-white/5 border border-white/5 rounded-2xl px-4 py-3.5 text-foreground text-sm font-bold placeholder:text-muted-foreground/30 outline-none focus:ring-2 focus:ring-accent/50 focus:bg-white/10 transition-all shadow-inner"
+          className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2.5 text-foreground text-sm font-bold placeholder:text-muted-foreground/30 outline-none focus:ring-2 focus:ring-accent/50 focus:bg-white/10 transition-all shadow-inner"
         />
         {value && (
           <button 
@@ -116,19 +118,23 @@ const LocationSearchInput = ({
       <AnimatePresence>
         {showSuggestions && (suggestions.length > 0 || loading) && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: suggestionsPosition === 'bottom' ? -10 : 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute left-0 right-0 mt-3 bg-card/95 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-2xl overflow-y-auto max-h-[280px] z-[2005] ring-1 ring-black/50"
+            exit={{ opacity: 0, y: suggestionsPosition === 'bottom' ? -10 : 10 }}
+            className={`absolute left-0 right-0 ${suggestionsPosition === 'bottom' ? 'top-full mt-3' : 'bottom-full mb-3'} bg-[#1A1A1E]/95 backdrop-blur-2xl border border-white/10 rounded-[28px] shadow-2xl z-[2005] ring-1 ring-black/50 overflow-hidden min-w-[280px]`}
+            style={{ 
+              height: loading ? '160px' : 'auto',
+              maxHeight: '400px'
+            }}
           >
             {loading ? (
-              <div className="p-8 flex flex-col items-center gap-3">
+              <div className="h-full flex flex-col items-center justify-center gap-3">
                 <Loader2 className="w-6 h-6 animate-spin text-accent" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Recherche en cours...</span>
               </div>
             ) : (
-              <div className="py-2">
-                {suggestions.map((s, idx) => (
+              <div className="max-h-[400px] overflow-y-auto no-scrollbar py-2 flex flex-col">
+                {(suggestionsPosition === 'bottom' ? suggestions : [...suggestions].reverse()).map((s, idx) => (
                   <button
                     key={idx}
                     type="button"
