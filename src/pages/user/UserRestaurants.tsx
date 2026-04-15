@@ -164,21 +164,21 @@ const UserRestaurants = () => {
     <div className="min-h-screen bg-[#0A0A0B] text-white flex flex-col safe-top safe-bottom overflow-x-hidden">
 
       {/* ── Fixed Top Section ── */}
-      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#0A0A0B]/90 backdrop-blur-xl border-b border-white/5 shadow-2xl safe-top">
+      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#0A0A0B]/90 backdrop-blur-xl border-b border-white/5 shadow-2xl safe-top landscape:bg-[#0A0A0B]/95">
         {/* Header */}
-        <header className="px-5 py-4 flex items-center justify-between">
+        <header className="px-5 py-4 landscape:py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/services')} aria-label="Retour" className="w-10 h-10 rounded-[14px] glass-strong border border-white/10 flex items-center justify-center active:scale-90 transition-all">
-              <ArrowLeft className="w-5 h-5" />
+            <button onClick={() => navigate('/services')} aria-label="Retour" className="w-10 h-10 landscape:w-8 landscape:h-8 rounded-[14px] glass-strong border border-white/10 flex items-center justify-center active:scale-90 transition-all">
+              <ArrowLeft className="w-5 h-5 landscape:w-4 landscape:h-4" />
             </button>
             <div>
-              <h1 className="text-xl font-black tracking-tight">Wego Food</h1>
+              <h1 className="text-xl font-black tracking-tight landscape:text-lg">Wego Food</h1>
               <p className="text-[10px] uppercase font-black tracking-widest text-white/30">{filteredProducts.length} plat{filteredProducts.length !== 1 ? 's' : ''} • {categoryLabel}</p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
-            <button onClick={() => navigate('/user/notifications')} aria-label="Notifications" className="w-10 h-10 rounded-[14px] glass-strong border border-white/10 flex items-center justify-center relative active:scale-90 transition-all">
-              <Bell className="w-5 h-5 text-white/60" />
+            <button onClick={() => navigate('/user/notifications')} aria-label="Notifications" className="w-10 h-10 landscape:w-8 landscape:h-8 rounded-[14px] glass-strong border border-white/10 flex items-center justify-center relative active:scale-90 transition-all">
+              <Bell className="w-5 h-5 landscape:w-4 landscape:h-4 text-white/60" />
               <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent animate-pulse" />
             </button>
             <button
@@ -197,9 +197,9 @@ const UserRestaurants = () => {
         </header>
 
         {/* Search */}
-        <div className="px-5 pb-4">
-          <div className="relative glass-strong rounded-[20px] flex items-center px-4 py-3 border border-white/5 focus-within:border-accent/40 transition-all">
-            <Search className="w-5 h-5 text-white/30 mr-3 shrink-0" />
+        <div className="px-5 pb-4 landscape:pb-2">
+          <div className="relative glass-strong rounded-[20px] flex items-center px-4 py-3 landscape:py-2 border border-white/5 focus-within:border-accent/40 transition-all">
+            <Search className="w-5 h-5 portrait:block hidden text-white/30 mr-3 shrink-0" />
             <input
               type="text"
               placeholder="Plat, restaurant, cuisine..."
@@ -216,7 +216,7 @@ const UserRestaurants = () => {
         </div>
       </div>
 
-      <div className="flex-1 px-5 pb-32 space-y-6 pt-[180px]">
+      <div className="flex-1 px-5 pb-32 space-y-6 pt-[180px] landscape:pt-[120px]">
 
         {/* ── Categories ── */}
         <div className="space-y-3">

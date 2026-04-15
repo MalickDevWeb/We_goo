@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Home, MapPin, Wallet, ClipboardList, User, Zap, ChevronRight, Clock } from 'lucide-react';
+import { Home, MapPin, Wallet, ClipboardList, User, Zap, ChevronRight, Clock, Truck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '@/services/socket';
 import { useState, useEffect } from 'react';
+import { playNotificationSound } from '@/utils/NotificationSound';
+import { toast } from 'sonner';
 
 const tabs = [
   { key: 'home',    path: '/user/dashboard', icon: Home          },
@@ -18,6 +20,17 @@ const UserLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeActivity, setActiveActivity] = useState<any>(null);
+
+  // Global Real-Time Notification: Driver Arrived
+  useSocket('driver_arrived', (data) => {
+    playNotificationSound();
+    toast.success('Votre chauffeur est arrivé !', {
+      description: data.message || 'Il vous attend au point de rendez-vous.',
+      icon: <div className="p-1 bg-accent rounded-lg shadow-lg shadow-accent/40"><Truck className="w-4 h-4 text-white" /></div>,
+      duration: 8000,
+      position: 'top-center'
+    });
+  });
 
   // Simulation: Show a live activity after 5 seconds of being on the app
   useEffect(() => {
@@ -35,7 +48,7 @@ const UserLayout = () => {
 
   return (
     <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto no-scrollbar pb-32 relative">
+      <div className="flex-1 overflow-y-auto no-scrollbar pb-32 landscape:pb-24 relative">
         
         {/* Global Live Activity Indicator */}
         <AnimatePresence>
@@ -74,9 +87,9 @@ const UserLayout = () => {
       </div>
 
       {/* Premium User Tab Bar */}
-      <nav className="fixed bottom-0 inset-x-0 z-[100] safe-bottom pb-4 px-6 pointer-events-none">
+      <nav className="fixed bottom-0 inset-x-0 z-[100] safe-bottom pb-4 landscape:pb-2 px-6 pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
-          <div className="glass-strong rounded-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-around h-20 px-4 relative overflow-hidden">
+          <div className="glass-strong rounded-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-around h-20 landscape:h-16 px-4 relative overflow-hidden">
             {/* Glossy highlight effect */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             
@@ -98,8 +111,8 @@ const UserLayout = () => {
                     />
                   )}
                   
-                  <div className={`relative z-10 p-2 rounded-xl transition-all duration-300 ${active ? 'bg-accent shadow-lg shadow-accent/20 scale-110' : 'text-white/30 group-hover:text-white/50'}`}>
-                    <Icon className={`w-5 h-5 ${active ? 'text-white' : ''}`} />
+                  <div className={`relative z-10 p-2 landscape:p-1.5 rounded-xl transition-all duration-300 ${active ? 'bg-accent shadow-lg shadow-accent/20 scale-110 landscape:scale-100' : 'text-white/30 group-hover:text-white/50'}`}>
+                    <Icon className={`w-5 h-5 landscape:w-4 landscape:h-4 ${active ? 'text-white' : ''}`} />
                   </div>
                   
                   {active && (

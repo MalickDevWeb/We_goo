@@ -138,28 +138,28 @@ const UserChat = () => {
   return (
     <div className="h-[100svh] bg-[#020617] relative overflow-hidden flex flex-col safe-top">
       {/* AI Futuristic Orbs Background */}
-      <div className="absolute top-[-20%] right-[-10%] w-[80%] h-[60%] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none transition-all duration-3000" />
-      <div className={`absolute bottom-0 left-[-20%] w-[60%] h-[50%] rounded-full blur-[100px] pointer-events-none transition-colors duration-1000 ${isRecording ? 'bg-red-500/20' : isTyping ? 'bg-accent/20' : 'bg-transparent'}`} />
+      <div className="absolute top-[-20%] right-[-10%] w-[80%] h-[60%] landscape:h-[40%] bg-blue-500/10 rounded-full blur-[120px] landscape:blur-[60px] pointer-events-none transition-all duration-3000" />
+      <div className={`absolute bottom-0 left-[-20%] w-[60%] h-[50%] landscape:h-[30%] rounded-full blur-[100px] landscape:blur-[50px] pointer-events-none transition-colors duration-1000 ${isRecording ? 'bg-red-500/20' : isTyping ? 'bg-accent/20' : 'bg-transparent'}`} />
 
       {/* Header */}
-      <div className="relative z-10 glass-strong px-6 py-4 flex items-center justify-between border-b border-white/5 shadow-2xl">
-        <div className="flex items-center gap-4">
+      <div className="relative z-10 glass-strong px-6 py-4 landscape:py-2 flex items-center justify-between border-b border-white/5 shadow-2xl">
+        <div className="flex items-center gap-4 landscape:gap-2">
           <button 
             onClick={() => navigate(-1)} 
             aria-label="Retour"
-            className="w-10 h-10 rounded-full glass border border-white/10 flex items-center justify-center active:scale-90 transition-transform bg-white/5" 
+            className="w-10 h-10 landscape:w-8 landscape:h-8 rounded-full glass border border-white/10 flex items-center justify-center active:scale-90 transition-transform bg-white/5" 
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-5 h-5 landscape:w-4 landscape:h-4 text-white" />
           </button>
           <div className="flex items-center gap-3">
              <div className="relative p-1">
                 <div className={`absolute inset-0 rounded-full border-2 border-dashed transition-all duration-1000 animate-spin-slow ${isTyping ? 'border-accent' : 'border-white/20'}`} />
-                <div className="w-12 h-12 rounded-full bg-blue-600/20 flex items-center justify-center border-2 border-[#020617] overflow-hidden relative z-10 shadow-[0_0_15px_rgba(37,99,235,0.5)]">
-                   <Bot className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 landscape:w-9 landscape:h-9 rounded-full bg-blue-600/20 flex items-center justify-center border-2 border-[#020617] overflow-hidden relative z-10 shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+                   <Bot className="w-6 h-6 landscape:w-4 landscape:h-4 text-blue-400" />
                 </div>
              </div>
              <div>
-                <p className="font-black text-white text-sm tracking-tight leading-none mb-1 flex items-center gap-2">
+                <p className="font-black text-white text-sm landscape:text-xs tracking-tight leading-none mb-1 flex items-center gap-2">
                    Wego AI Assistant
                    <Cpu className="w-3.5 h-3.5 text-accent" />
                 </p>
@@ -260,7 +260,7 @@ const UserChat = () => {
       </div>
 
       {/* Voice / Text Input Area */}
-      <div className="relative z-10 p-6 pb-8 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-transparent">
+      <div className="relative z-10 p-6 pb-8 landscape:p-3 landscape:pb-4 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-transparent">
          {/* Voice Wave Visualizer */}
          <AnimatePresence>
             {isRecording && (
@@ -291,12 +291,12 @@ const UserChat = () => {
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               placeholder="Écrivez ou dictez votre demande..."
               disabled={isRecording}
-              className="w-full h-14 px-5 pr-14 rounded-2xl bg-white/5 text-white text-sm placeholder:text-white/30 outline-none border border-white/10 focus:border-accent/40 focus:bg-white/[0.08] transition-all disabled:opacity-50"
+              className="w-full h-14 landscape:h-11 px-5 pr-14 rounded-2xl bg-white/5 text-white text-sm placeholder:text-white/30 outline-none border border-white/10 focus:border-accent/40 focus:bg-white/[0.08] transition-all disabled:opacity-50"
             />
             {input.trim() ? (
                <button
                  onClick={handleSend}
-                 className="absolute right-2 w-10 h-10 rounded-xl bg-accent text-white transition-all active:scale-90 flex items-center justify-center shadow-lg shadow-accent/20"
+                 className="absolute right-2 w-10 h-10 landscape:w-8 landscape:h-8 rounded-xl bg-accent text-white transition-all active:scale-90 flex items-center justify-center shadow-lg shadow-accent/20"
                  aria-label="Envoyer"
                >
                  <Send className="w-4 h-4" />
@@ -304,10 +304,10 @@ const UserChat = () => {
             ) : (
                <button
                  onClick={handleVoiceCommand}
-                 className={`absolute right-2 w-10 h-10 rounded-xl text-white transition-all active:scale-90 flex items-center justify-center shadow-lg ${isRecording ? 'bg-red-500 shadow-red-500/50 animate-pulse' : 'bg-transparent border border-white/10'}`}
+                 className={`absolute right-2 w-10 h-10 landscape:w-8 landscape:h-8 rounded-xl text-white transition-all active:scale-90 flex items-center justify-center shadow-lg ${isRecording ? 'bg-red-500 shadow-red-500/50 animate-pulse' : 'bg-transparent border border-white/10'}`}
                  aria-label="Microphone"
                >
-                 <Mic className={`w-5 h-5 ${isRecording ? 'text-white' : 'text-white/40'}`} />
+                 <Mic className={`w-5 h-5 landscape:w-4 landscape:h-4 ${isRecording ? 'text-white' : 'text-white/40'}`} />
                </button>
             )}
           </div>

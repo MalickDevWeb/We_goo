@@ -12,6 +12,7 @@ import WegoMap, { createPhotoIcon, pickupIcon, destinationIcon } from '@/compone
 import type { MapMarker } from '@/components/WegoMap';
 import { getRealRoute } from '@/services/mapService';
 import CameraScanner from '@/components/CameraScanner';
+import { socketProvider } from '@/services/socket';
 
 // ─── Real Dakar coordinates ──────────────────────────────────────────────────
 // Plateau → Almadies (real Dakar streets)
@@ -167,6 +168,10 @@ const PackageTracking = () => {
     setShowArrivalSim(false);
     setShowOTP(true);
     setProgress(0.95);
+    
+    // Play sound and show global notification via Socket
+    socketProvider.emit('simulate_driver_arrival', { id: pkg.id });
+    
     toast.info('Livreur arrivé à destination !');
   };
 
@@ -179,7 +184,7 @@ const PackageTracking = () => {
   return (
     <div className="h-screen bg-background flex flex-col relative overflow-hidden">
       {/* ── Map ── */}
-      <div className={`transition-all duration-500 ${sheetExpanded ? 'h-[30%]' : 'h-[52%]'}`}>
+      <div className={`transition-all duration-500 ${sheetExpanded ? 'h-[30%]' : 'h-[52%]'} landscape:h-[35%]`}>
         <WegoMap
           markers={markers}
           routePoints={route}
@@ -222,14 +227,14 @@ const PackageTracking = () => {
         className="flex-1 bg-[#0A0A0B] border-t border-white/10 rounded-t-[32px] relative z-[1000] flex flex-col overflow-hidden"
       >
         {/* Handle */}
-        <div className="flex-1 overflow-y-auto no-scrollbar px-5 pb-6 space-y-4 pt-1">
+        <div className="flex-1 overflow-y-auto no-scrollbar px-5 pb-6 landscape:pb-4 space-y-4 landscape:space-y-3 pt-1">
 
           {/* ── Triple-Actor Status Link ── */}
-          <div className="glass-strong rounded-[24px] p-4 border border-white/5 relative overflow-hidden bg-white/[0.02]">
+          <div className="glass-strong rounded-[24px] p-4 landscape:p-2 border border-white/5 relative overflow-hidden bg-white/[0.02]">
              <div className="flex items-center justify-between relative z-10 px-2">
-                <div className="flex flex-col items-center gap-2">
-                   <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center border border-accent/30 shadow-lg shadow-accent/10">
-                      <User className="w-5 h-5 text-accent" />
+                <div className="flex flex-col items-center gap-2 landscape:gap-1">
+                   <div className="w-10 h-10 landscape:w-8 landscape:h-8 rounded-full bg-accent/20 flex items-center justify-center border border-accent/30 shadow-lg shadow-accent/10">
+                      <User className="w-5 h-5 landscape:w-4 landscape:h-4 text-accent" />
                    </div>
                    <span className="text-[8px] font-black text-white/40 uppercase tracking-widest">{pkg?.senderName?.split(' ')[0] || 'Vous'}</span>
                 </div>

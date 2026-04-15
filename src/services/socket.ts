@@ -45,6 +45,14 @@ class SocketService {
         });
       }, 300);
     }
+
+    if (event === 'simulate_driver_arrival') {
+       this.dispatchEvent('driver_arrived', {
+          id: data.id || 'DEMO-123',
+          driverName: 'Mamadou Diallo',
+          message: 'Votre chauffeur est arrivé à destination !'
+       });
+    }
   }
 
   private dispatchEvent(event: string, data: any) {

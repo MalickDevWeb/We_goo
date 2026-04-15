@@ -181,20 +181,20 @@ const UserCommerce = () => {
       <div className="fixed bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent2/10 blur-[100px] rounded-full -z-10" />
 
       {/* ── Fixed Top Section ── */}
-      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#0A0A0B]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl safe-top">
+      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#0A0A0B]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl safe-top landscape:bg-[#0A0A0B]/95">
         {/* Header */}
-        <header className="px-6 py-4 flex items-center justify-between">
+        <header className="px-6 py-4 landscape:py-2 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/services')} 
-              className="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white/5 active:scale-90 transition-all"
+              className="w-10 h-10 landscape:w-8 landscape:h-8 rounded-2xl glass flex items-center justify-center hover:bg-white/5 active:scale-90 transition-all"
               aria-label="Retour"
               title="Retour"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 landscape:w-4 landscape:h-4" />
             </button>
             <div>
-              <h1 className="text-xl font-black tracking-tight">Commerce</h1>
+              <h1 className="text-xl font-black tracking-tight landscape:text-lg">Commerce</h1>
               <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-60">Wego Mall</p>
             </div>
           </div>
@@ -204,9 +204,9 @@ const UserCommerce = () => {
               onClick={() => navigate('/user/notifications')}
               aria-label="Notifications" 
               title="Notifications"
-              className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all"
+              className="w-10 h-10 landscape:w-8 landscape:h-8 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all"
             >
-              <Bell className="w-5 h-5 text-white/70" />
+              <Bell className="w-5 h-5 landscape:w-4 landscape:h-4 text-white/70" />
               <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent animate-pulse" />
             </button>
             <button 
@@ -230,11 +230,11 @@ const UserCommerce = () => {
         </header>
 
         {/* Search Bar */}
-        <div className="px-6 pb-4">
+        <div className="px-6 pb-4 landscape:pb-2">
           <div className="relative group">
             <div className="absolute inset-0 bg-accent/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity rounded-3xl" />
-            <div className="relative glass rounded-[24px] flex items-center px-5 py-4 border border-white/5 focus-within:border-accent/40 transition-all">
-              <Search className="w-5 h-5 text-white/30 mr-3 group-focus-within:text-accent transition-colors" />
+            <div className="relative glass rounded-[24px] flex items-center px-5 py-4 landscape:py-2 border border-white/5 focus-within:border-accent/40 transition-all">
+              <Search className="w-5 h-5 portrait:block hidden text-white/30 mr-3 group-focus-within:text-accent transition-colors" />
               <input 
                 type="text"
                 placeholder="Rechercher un produit, une boutique..."

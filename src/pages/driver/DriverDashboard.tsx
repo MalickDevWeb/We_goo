@@ -114,13 +114,13 @@ const DriverDashboard = () => {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 px-6 pt-6 pb-4 shrink-0 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className={`w-14 h-14 rounded-2xl p-0.5 border-2 transition-colors duration-500 overflow-hidden shadow-2xl ${driver?.isOnline ? 'border-emerald-500' : 'border-white/10'}`}>
+      <header className="relative z-10 px-6 pt-6 pb-4 landscape:pt-3 landscape:pb-2 shrink-0 flex items-center justify-between">
+        <div className="flex items-center gap-4 landscape:gap-3">
+          <div className={`w-14 h-14 landscape:w-10 landscape:h-10 rounded-2xl p-0.5 border-2 transition-colors duration-500 overflow-hidden shadow-2xl ${driver?.isOnline ? 'border-emerald-500' : 'border-white/10'}`}>
             <img src={driverPhoto} alt="Profile" className="w-full h-full object-cover rounded-xl" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-white tracking-tight leading-none mb-1 shadow-black drop-shadow-xl">
+            <h1 className="text-xl font-black text-white tracking-tight leading-none mb-1 shadow-black drop-shadow-xl landscape:text-lg">
               Salut, {driver?.name || 'Chauffeur'}
             </h1>
             <div className="flex items-center gap-1.5">
@@ -134,10 +134,10 @@ const DriverDashboard = () => {
         <div className="flex gap-2">
            <button 
              onClick={() => navigate('/driver/notifications')}
-             className="w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center active:scale-95 transition-transform relative shadow-xl"
+             className="w-12 h-12 landscape:w-10 landscape:h-10 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center active:scale-95 transition-transform relative shadow-xl"
            >
              <Bell className="w-5 h-5 text-white/60" />
-             {availableRequests.length > 0 && <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-accent rounded-full border-[3px] border-[#020617] shadow-[0_0_10px_rgba(230,32,87,1)]" />}
+             {availableRequests.length > 0 && <div className="absolute top-3 right-3 landscape:top-2 landscape:right-2 w-2.5 h-2.5 bg-accent rounded-full border-[3px] border-[#020617] shadow-[0_0_10px_rgba(230,32,87,1)]" />}
            </button>
         </div>
       </header>
@@ -152,18 +152,18 @@ const DriverDashboard = () => {
         >
           <button
             onClick={toggleOnline}
-            className={`w-full rounded-[36px] p-2 border transition-all duration-700 relative overflow-hidden group shadow-2xl ${
+            className={`w-full rounded-[36px] p-2 landscape:p-1 border transition-all duration-700 relative overflow-hidden group shadow-2xl ${
               driver?.isOnline 
                 ? 'border-emerald-500/40 bg-emerald-500/10 shadow-emerald-500/20' 
                 : 'border-white/10 bg-black/40'
             }`}
           >
-            <div className="flex items-center justify-between p-5 relative z-10">
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-700 ${
+            <div className="flex items-center justify-between p-5 landscape:p-3 relative z-10">
+              <div className="flex items-center gap-4 landscape:gap-3">
+                <div className={`w-14 h-14 landscape:w-10 landscape:h-10 rounded-2xl flex items-center justify-center transition-all duration-700 ${
                   driver?.isOnline ? 'bg-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.5)]' : 'bg-white/10'
                 }`}>
-                  <Power className={`w-7 h-7 ${driver?.isOnline ? 'text-black' : 'text-white/20'}`} />
+                  <Power className={`w-7 h-7 landscape:w-5 landscape:h-5 ${driver?.isOnline ? 'text-black' : 'text-white/20'}`} />
                 </div>
                 <div className="text-left">
                   <span className={`block font-black text-lg tracking-tight ${driver?.isOnline ? 'text-white' : 'text-white/40'}`}>
@@ -194,17 +194,17 @@ const DriverDashboard = () => {
             animate={{ opacity: 1, height: 'auto' }}
             className="grid grid-cols-3 gap-3 mb-8"
           >
-            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/5 text-center flex flex-col items-center justify-center">
+            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 landscape:p-2 border border-white/5 text-center flex flex-col items-center justify-center">
               <TrendingUp className="w-4 h-4 text-emerald-500 mb-1" />
               <p className="text-[8px] font-black uppercase text-white/30 tracking-widest leading-none mb-1">Surge</p>
               <p className="text-xs font-black text-emerald-500">x1.4</p>
             </div>
-            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/5 text-center flex flex-col items-center justify-center cursor-pointer" onClick={() => navigate('/driver/earnings')}>
+            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 landscape:p-2 border border-white/5 text-center flex flex-col items-center justify-center cursor-pointer" onClick={() => navigate('/driver/earnings')}>
               <DollarSign className="w-4 h-4 text-accent2 mb-1" />
               <p className="text-[8px] font-black uppercase text-white/30 tracking-widest leading-none mb-1">Gains</p>
               <p className="text-xs font-black text-white">{driver?.todayEarnings || 0}F</p>
             </div>
-            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/5 text-center flex flex-col items-center justify-center">
+            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 landscape:p-2 border border-white/5 text-center flex flex-col items-center justify-center">
               <Star className="w-4 h-4 text-yellow-400 mb-1" />
               <p className="text-[8px] font-black uppercase text-white/30 tracking-widest leading-none mb-1">Note</p>
               <p className="text-xs font-black text-white">{driver?.rating || '5.0'}</p>
