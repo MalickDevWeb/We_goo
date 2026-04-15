@@ -9,6 +9,7 @@ import * as api from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { getRealRoute } from '@/services/mapService';
 import { toast } from 'sonner';
+import CameraScanner from '@/components/CameraScanner';
 
 const DriverTracking = () => {
   const { t } = useTranslation();
@@ -23,6 +24,11 @@ const DriverTracking = () => {
   const [userName, setUserName] = useState("María López");
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
+  
+  // Validation Modals
+  const [showValidation, setShowValidation] = useState<'none' | 'pickup' | 'delivery'>('none');
+  const [pinInput, setPinInput] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -62,21 +68,59 @@ const DriverTracking = () => {
 
   const updateStatus = async () => {
     if (!ride) return;
-    let nextStatus: any = 'arriving';
-    if (ride.status === 'accepted') nextStatus = 'arriving';
-    else if (ride.status === 'arriving') nextStatus = 'in-progress';
-    else if (ride.status === 'in-progress') nextStatus = 'completed';
+    
+    // Status Flow: accepted -> arriving -> in-progress -> completed
+    if (ride.status === 'accepted') {
+       // Driver arrived at pickup
+       handleStateChange('arriving');
+    } else if (ride.status === 'arriving') {
+       // Driver needs to validate pickup PIN
+       setShowValidation('pickup');
+    } else if (ride.status === 'in-progress') {
+       // Driver needs to validate delivery OTP/QR
+       setShowValidation('delivery');
+    }
+  };
 
+  const handleStateChange = async (nextStatus: string) => {
+    if (!ride) return;
     try {
-      const updated = await api.updateRide(ride.id, { status: nextStatus });
+      const updated = await api.updateRide(ride.id, { status: nextStatus as any });
       setRide(updated);
-      toast.success(`Estado actualizado: ${nextStatus}`);
+      toast.success(`Action validée avec succès`);
+      setShowValidation('none');
+      setPinInput('');
+      setIsScanning(false);
+      
       if (nextStatus === 'completed') {
         setTimeout(() => navigate('/driver/dashboard'), 2000);
       }
     } catch (error) {
-      toast.error("Error al actualizar estado");
+      toast.error("Erreur lors de la mise à jour");
     }
+  };
+
+  const handleValidationSubmit = () => {
+     if (showValidation === 'pickup') {
+        // Mock verification
+        if (pinInput.length >= 4) {
+           handleStateChange('in-progress');
+        } else {
+           toast.error('PIN invalide');
+        }
+     } else if (showValidation === 'delivery') {
+        // Mock verification
+        if (pinInput.length >= 4) {
+           handleStateChange('completed');
+        } else {
+           toast.error('OTP invalide');
+        }
+     }
+  };
+
+  const handleQRScan = (data: string) => {
+     toast.success('QR Code scanné avec succès');
+     setTimeout(() => handleStateChange('completed'), 1000);
   };
 
   const submitReport = async (reason: string) => {
@@ -89,7 +133,7 @@ const DriverTracking = () => {
   const getStatusAction = () => {
     switch (ride?.status) {
       case 'accepted': return { label: t('driver.dashboard.validateArrived'), icon: MapPin, color: 'bg-accent' };
-      case 'arriving': return { label: t('driver.dashboard.startRide'), icon: Play, color: 'bg-accent2' };
+      case 'arriving': return { label: t('driver.dashboard.startRide'), icon: Play, color: 'bg-accent' };
       case 'in-progress': return { label: t('driver.dashboard.completeRide'), icon: Flag, color: 'bg-green-500' };
       default: return { label: t('common.back'), icon: CheckCircle2, color: 'bg-muted' };
     }
@@ -156,15 +200,15 @@ const DriverTracking = () => {
              
              <div className="flex-1 px-4 flex items-center gap-1">
                 <div className={`h-1 flex-1 rounded-full ${ride.status !== 'accepted' ? 'bg-accent shadow-[0_0_8px_rgba(230,32,87,0.5)]' : 'bg-white/10'}`} />
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${ride.status === 'in-progress' ? 'bg-accent/20 border-accent/30 animate-pulse' : (ride.status === 'completed' ? 'bg-accent2/20 border-accent2/30' : 'bg-white/5 border-white/5')}`}>
-                   <Truck className={`w-2.5 h-2.5 ${ride.status === 'in-progress' ? 'text-accent' : (ride.status === 'completed' ? 'text-accent2' : 'text-white/20')}`} />
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${ride.status === 'in-progress' ? 'bg-accent/20 border-accent/30 animate-pulse' : (ride.status === 'completed' ? 'bg-accent/20 border-accent/30' : 'bg-white/5 border-white/5')}`}>
+                   <Truck className={`w-2.5 h-2.5 ${ride.status === 'in-progress' ? 'text-accent' : (ride.status === 'completed' ? 'text-accent' : 'text-white/20')}`} />
                 </div>
-                <div className={`h-1 flex-1 rounded-full ${ride.status === 'completed' ? 'bg-accent2 shadow-[0_0_8px_rgba(30,192,255,0.5)]' : 'bg-white/10'}`} />
+                <div className={`h-1 flex-1 rounded-full ${ride.status === 'completed' ? 'bg-accent shadow-[0_0_8px_rgba(230,32,87,0.5)]' : 'bg-white/10'}`} />
              </div>
 
              <div className="flex flex-col items-center gap-1.5">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center border ${ride.status === 'completed' ? 'bg-accent2/20 border-accent2/30' : 'bg-white/5 border-white/10'}`}>
-                   <User className={`w-4 h-4 ${ride.status === 'completed' ? 'text-accent2' : 'text-white/20'}`} />
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center border ${ride.status === 'completed' ? 'bg-accent/20 border-accent/30' : 'bg-white/5 border-white/10'}`}>
+                   <User className={`w-4 h-4 ${ride.status === 'completed' ? 'text-accent' : 'text-white/20'}`} />
                 </div>
                 <span className="text-[7px] font-black text-white/40 uppercase tracking-widest truncate max-w-[50px]">{ride.receiverName?.split(' ')[0] || 'Dest.'}</span>
              </div>
@@ -173,10 +217,10 @@ const DriverTracking = () => {
           <div className="flex items-center justify-between p-4 glass rounded-3xl border border-white/5">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-accent2/10 flex items-center justify-center overflow-hidden border border-accent2/30">
-                  <span className="text-xl font-black text-accent2">{userName.split(' ').map(n => n[0]).join('')}</span>
+                <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center overflow-hidden border border-accent/30">
+                  <span className="text-xl font-black text-accent">{userName.split(' ').map(n => n[0]).join('')}</span>
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-accent2 border-2 border-background flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-accent border-2 border-background flex items-center justify-center">
                   <ShieldCheck className="w-3 h-3 text-white" />
                 </div>
               </div>
@@ -199,7 +243,7 @@ const DriverTracking = () => {
                 <Phone className="w-5 h-5" />
               </button>
               <button 
-                className="w-12 h-12 rounded-2xl glass border border-white/10 flex items-center justify-center text-accent2 active:scale-90 transition-transform shadow-lg" 
+                className="w-12 h-12 rounded-2xl glass border border-white/10 flex items-center justify-center text-white/60 hover:text-white active:scale-90 transition-transform shadow-lg" 
                 aria-label={t('user.tracking.message')}
               >
                 <MessageCircle className="w-5 h-5" />
@@ -212,14 +256,14 @@ const DriverTracking = () => {
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="p-4 glass rounded-3xl border-2 border-accent2/20 bg-accent2/5 flex items-center justify-between"
+              className="p-4 glass rounded-3xl border border-white/5 flex items-center justify-between"
             >
                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-accent2/20 flex items-center justify-center border border-accent2/30">
-                     <User className="w-6 h-6 text-accent2" />
+                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                     <User className="w-6 h-6 text-white/60" />
                   </div>
                   <div>
-                     <p className="text-[8px] font-black text-accent2 uppercase tracking-widest mb-0.5">Contact Final (Destinataire)</p>
+                     <p className="text-[8px] font-black text-white/40 uppercase tracking-widest mb-0.5">Contact Final (Destinataire)</p>
                      <h4 className="text-sm font-black text-white">{ride.receiverName || 'Chargement...'}</h4>
                      <p className="text-[10px] font-bold text-white/40">{ride.receiverPhone || '---'}</p>
                   </div>
@@ -227,7 +271,7 @@ const DriverTracking = () => {
                <button 
                  title="Contacter le destinataire"
                  aria-label="Contacter le destinataire"
-                 className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-accent2 transition-colors"
+                 className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors"
                >
                  <MessageCircle className="w-5 h-5" />
                </button>
@@ -236,7 +280,7 @@ const DriverTracking = () => {
 
           {/* Route Details Glass Box */}
           <div className="glass-strong rounded-[32px] p-6 space-y-5 border border-white/5 relative overflow-hidden bg-white/[0.02]">
-             <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-2xl -mr-12 -mt-12" />
+             {/* removed the accent/5 blur gradient */}
              
              <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
@@ -251,8 +295,8 @@ const DriverTracking = () => {
              <div className="ml-4 w-px h-4 bg-white/10" />
              
              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-xl bg-accent2/20 flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4 text-accent2" />
+                <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4 text-white/60" />
                 </div>
                 <div className="min-w-0 flex-1">
                    <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-0.5">Destination</p>
@@ -271,6 +315,82 @@ const DriverTracking = () => {
           </motion.button>
         </div>
       </motion.div>
+
+      {/* Validation Modals (Pickup / Delivery) */}
+      <AnimatePresence>
+         {showValidation !== 'none' && (
+           <motion.div 
+             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+             className="fixed inset-0 z-[2200] flex items-end justify-center p-4 bg-black/80 backdrop-blur-md"
+             onClick={() => setShowValidation('none')}
+           >
+             <motion.div 
+               initial={{ y: 200, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 200, opacity: 0 }}
+               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+               className="w-full max-w-sm glass-strong rounded-[36px] bg-background border border-white/10 shadow-2xl p-6"
+               onClick={e => e.stopPropagation()}
+             >
+                <div className="flex justify-between items-center mb-6">
+                   <h2 className="text-xl font-black text-white">
+                      {showValidation === 'pickup' ? 'Validation Collecte' : 'Validation Livraison'}
+                   </h2>
+                   <button aria-label="Fermer" onClick={() => setShowValidation('none')} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/50">
+                      <X className="w-4 h-4" />
+                   </button>
+                </div>
+
+                <div className="flex gap-2 mb-6 p-1 bg-white/5 rounded-2xl border border-white/10">
+                   <button 
+                      className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all ${!isScanning ? 'bg-accent/20 text-accent border border-accent/20' : 'text-white/40'}`}
+                      onClick={() => setIsScanning(false)}
+                   >
+                      {showValidation === 'pickup' ? 'Saisir PIN' : 'Code OTP'}
+                   </button>
+                   <button 
+                      className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center justify-center gap-2 ${isScanning ? 'bg-accent/20 text-accent border border-accent/20' : 'text-white/40'}`}
+                      onClick={() => setIsScanning(true)}
+                   >
+                      Scanner QR
+                   </button>
+                </div>
+
+                {isScanning ? (
+                   <div className="mb-6">
+                      <CameraScanner onScanSuccess={handleQRScan} />
+                      <p className="text-[10px] text-white/40 text-center mt-4">
+                         {showValidation === 'pickup' ? "Placez le QR Code de l'expéditeur dans le cadre pour certifier la collecte." : "Placez le QR Code du client dans le cadre pour valider la livraison automatiquement."}
+                      </p>
+                   </div>
+                ) : (
+                   <div className="space-y-6">
+                      <div>
+                         <p className="text-[10px] text-white/40 uppercase font-black tracking-widest pl-2 mb-2 pb-2">
+                           Saisissez le {showValidation === 'pickup' ? 'code PIN de l\'expéditeur' : 'code OTP du destinataire'}
+                         </p>
+                         <input 
+                           type="text"
+                           placeholder="Ex: 4821"
+                           value={pinInput}
+                           onChange={e => setPinInput(e.target.value)}
+                           className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-2xl font-mono text-center text-white outline-none focus:border-accent font-black tracking-[0.3em]"
+                           maxLength={4}
+                           autoFocus
+                         />
+                      </div>
+                      <button 
+                         onClick={handleValidationSubmit}
+                         disabled={pinInput.length < 4}
+                         className={`w-full py-4 rounded-2xl font-black text-white text-sm transition-all focus:outline-none disabled:opacity-30 bg-accent`}
+                      >
+                         Valider
+                      </button>
+                   </div>
+                )}
+
+             </motion.div>
+           </motion.div>
+         )}
+      </AnimatePresence>
 
       {/* Cancellation / Report Modal */}
       <AnimatePresence>

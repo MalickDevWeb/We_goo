@@ -124,7 +124,6 @@ const UserHistory = () => {
     <div className="h-[100svh] flex flex-col bg-background relative overflow-hidden safe-top">
       {/* Dynamic Animated Background */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/10 rounded-full blur-[120px] pointer-events-none animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-accent2/5 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Header */}
       <header className="relative z-10 px-6 pt-6 pb-2 shrink-0 flex items-center gap-4">
@@ -155,13 +154,10 @@ const UserHistory = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative flex-shrink-0 flex items-center justify-center gap-2 px-5 py-3 rounded-[20px] border transition-all text-xs font-black tracking-wide overflow-hidden group ${
                   active 
-                    ? 'border-accent/40 shadow-xl shadow-accent/20' 
+                    ? 'bg-accent border-accent/40 text-white shadow-xl shadow-accent/20' 
                     : 'glass shadow-none text-white/50 active:bg-white/5 border-white/5 hover:bg-white/10'
                 }`}
               >
-                {active && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent2 opacity-80 z-0" />
-                )}
                 <Icon className={`w-4 h-4 z-10 relative ${active ? 'text-white' : 'group-hover:text-white/80'}`} />
                 <span className={`z-10 relative ${active ? 'text-white' : ''}`}>{tab.label}</span>
               </button>
@@ -242,7 +238,7 @@ const UserHistory = () => {
                         <span className="truncate">{item.from}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-[13px] text-white font-bold truncate mt-1">
-                        <MapPin className="w-3.5 h-3.5 text-accent2 shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-white/40 shrink-0" />
                         <span className="truncate">{item.to}</span>
                       </div>
                       {'description' in item && item.description && (
@@ -318,7 +314,7 @@ const UserHistory = () => {
                 </div>
                 <div className="w-px h-3 bg-white/10 ml-2" />
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-accent2 shrink-0" />
+                  <MapPin className="w-4 h-4 text-white/40 shrink-0" />
                   <span className="text-xs font-bold text-white truncate">{cancelTarget.to}</span>
                 </div>
               </div>

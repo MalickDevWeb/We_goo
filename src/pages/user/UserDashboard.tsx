@@ -52,6 +52,30 @@ const UserDashboard = () => {
 
   return (
     <div className="h-full safe-top px-6 flex flex-col overflow-hidden">
+      {/* ── Receiver Inbox Banner ── */}
+      <motion.button
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08 }}
+        onClick={() => navigate('/user/receiver-inbox')}
+        className="w-full mt-3 mb-2 flex items-center justify-between px-4 py-3 rounded-[22px] bg-accent2/10 border border-accent2/25 active:scale-[0.98] transition-all shrink-0"
+      >
+        <div className="flex items-center gap-3">
+          <div className="relative w-9 h-9 rounded-xl bg-accent2/20 flex items-center justify-center border border-accent2/30">
+            <Package className="w-4 h-4 text-accent2" />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full border-2 border-background animate-pulse" />
+          </div>
+          <div className="text-left">
+            <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">Temps réel</p>
+            <p className="text-xs font-black text-white">Mes Réceptions</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] font-black text-accent2 bg-accent2/10 px-2 py-1 rounded-full border border-accent2/20">3 en cours</span>
+          <ArrowRight className="w-4 h-4 text-white/30" />
+        </div>
+      </motion.button>
+
       <motion.div 
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 

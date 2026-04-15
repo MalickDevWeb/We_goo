@@ -23,7 +23,7 @@ export const servicesCatalog: ServiceItem[] = [
     flag: 'version2_restaurants',
     imageSrc: '/images/photos/achat_restaurant.png',
   },
-  { key: 'hotels', icon: Hotel, available: false, flag: 'version2_hotels', imageSrc: '/images/photos/location_immobilier.png' },
+  { key: 'hotels', icon: Hotel, available: true, flag: 'version2_hotels', imageSrc: '/images/photos/location_immobilier.png' },
 ];
 
 export function isServiceKey(value: string): value is ServiceKey {

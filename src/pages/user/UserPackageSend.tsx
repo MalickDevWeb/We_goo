@@ -138,34 +138,37 @@ const UserPackageSend = () => {
       <div className="absolute top-[-100px] left-[-100px] w-64 h-64 bg-accent/20 blur-[120px] rounded-full" />
       <div className="absolute top-[20%] right-[-100px] w-80 h-80 bg-accent2/10 blur-[120px] rounded-full" />
 
-      <header className="px-6 pt-12 pb-6 relative z-30">
-        <div className="flex items-center justify-between mb-8">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center active:scale-90 transition-all border border-white/10 shadow-xl"
-            aria-label={t('common.back')}
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <div className="flex flex-col items-end">
-             <div className="flex items-center gap-1 bg-accent/10 px-3 py-1 rounded-full border border-accent/20 border-glow">
-                <Sparkles className="w-3 h-3 text-accent animate-pulse" />
-                <span className="text-[10px] font-black text-accent uppercase tracking-widest italic">Wego Select</span>
-             </div>
+      {/* ── Fixed Top Section ── */}
+      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#0A0A0B]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl safe-top">
+        <header className="px-6 py-4 relative z-30">
+          <div className="flex items-center justify-between mb-4">
+            <button 
+              onClick={() => navigate(-1)} 
+              className="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center active:scale-90 transition-all border border-white/10 shadow-xl"
+              aria-label={t('common.back')}
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <div className="flex flex-col items-end">
+               <div className="flex items-center gap-1 bg-accent/10 px-3 py-1 rounded-full border border-accent/20 border-glow">
+                  <Sparkles className="w-3 h-3 text-accent animate-pulse" />
+                  <span className="text-[10px] font-black text-accent uppercase tracking-widest italic">Wego Select</span>
+               </div>
+            </div>
           </div>
-        </div>
 
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-1">
-          <h1 className="text-4xl font-black text-white tracking-tighter leading-none italic uppercase">
-            {getTitle()}
-          </h1>
-          <p className="text-sm font-bold text-white/40 max-w-[280px] leading-relaxed pt-2">
-            {getDescription()}
-          </p>
-        </motion.div>
-      </header>
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-1">
+            <h1 className="text-4xl font-black text-white tracking-tighter leading-none italic uppercase">
+              {getTitle()}
+            </h1>
+            <p className="text-sm font-bold text-white/40 max-w-[280px] leading-relaxed pt-2">
+              {getDescription()}
+            </p>
+          </motion.div>
+        </header>
+      </div>
 
-      <div className="flex-1 relative z-20 px-6 overflow-y-auto no-scrollbar pb-32">
+      <div className="flex-1 relative z-20 px-6 overflow-y-auto no-scrollbar pt-[180px] pb-32">
         <AnimatePresence mode="wait">
           {step === 'form' && (
             <motion.div key="form" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} className="space-y-8">

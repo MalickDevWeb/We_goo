@@ -29,11 +29,13 @@ import UserChat from "@/pages/user/UserChat";
 import UserEmergency from "@/pages/user/UserEmergency";
 import UserPackageSend from "@/pages/user/UserPackageSend";
 import UserLostItem from "@/pages/user/UserLostItem";
+import ReceiverInbox from "@/pages/user/ReceiverInbox";
 import UserSecurity from "@/pages/user/UserSecurity";
 import UserNotifications from "@/pages/user/UserNotifications";
 import UserCommerce from "@/pages/user/UserCommerce";
 import UserRestaurants from "@/pages/user/UserRestaurants";
 import UserRental from "@/pages/user/UserRental";
+import UserHotels from "@/pages/user/UserHotels";
 
 import DriverDashboard from "@/pages/driver/DriverDashboard";
 import DriverTracking from "@/pages/driver/DriverTracking";
@@ -42,6 +44,7 @@ import DriverEarnings from "@/pages/driver/DriverEarnings";
 import DriverWallet from "@/pages/driver/DriverWallet";
 import DriverProfile from "@/pages/driver/DriverProfile";
 import DriverEditProfile from "@/pages/driver/DriverEditProfile";
+import DriverVehicle from "@/pages/driver/DriverVehicle";
 import DriverNotifications from "@/pages/driver/DriverNotifications";
 import DriverEmergency from "@/pages/driver/DriverEmergency";
 import DriverLayout from "@/components/DriverLayout";
@@ -98,6 +101,8 @@ const App = () => (
           <Route path="/user/commerce" element={<RequireAuth allowedRoles={['user']}><UserCommerce /></RequireAuth>} />
           <Route path="/user/restaurants" element={<RequireAuth allowedRoles={['user']}><UserRestaurants /></RequireAuth>} />
           <Route path="/user/rental" element={<RequireAuth allowedRoles={['user']}><UserRental /></RequireAuth>} />
+          <Route path="/user/hotels" element={<RequireAuth allowedRoles={['user']}><UserHotels /></RequireAuth>} />
+          <Route path="/user/receiver-inbox" element={<RequireAuth allowedRoles={['user']}><ReceiverInbox /></RequireAuth>} />
 
           {/* Driver (with tab layout) */}
           <Route path="/driver" element={<RequireAuth allowedRoles={['driver']}><DriverLayout /></RequireAuth>}>
@@ -111,6 +116,7 @@ const App = () => (
           {/* Driver stack screens (no tab bar) */}
           <Route path="/driver/tracking" element={<RequireAuth allowedRoles={['driver']}><DriverTracking /></RequireAuth>} />
           <Route path="/driver/profile/edit" element={<RequireAuth allowedRoles={['driver']}><DriverEditProfile /></RequireAuth>} />
+          <Route path="/driver/profile/vehicle" element={<RequireAuth allowedRoles={['driver']}><DriverVehicle /></RequireAuth>} />
           <Route path="/driver/emergency" element={<RequireAuth allowedRoles={['driver']}><DriverEmergency /></RequireAuth>} />
           <Route path="/driver/chat" element={<RequireAuth allowedRoles={['driver']}><UserChat /></RequireAuth>} />
 

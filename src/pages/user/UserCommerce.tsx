@@ -180,77 +180,83 @@ const UserCommerce = () => {
       <div className="fixed top-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/10 blur-[120px] rounded-full -z-10" />
       <div className="fixed bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent2/10 blur-[100px] rounded-full -z-10" />
 
-      {/* Header */}
-      <header className="px-6 py-6 flex items-center justify-between sticky top-0 bg-[#0A0A0B]/80 backdrop-blur-xl z-[100]">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate('/services')} 
-            className="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white/5 active:scale-90 transition-all"
-            aria-label="Retour"
-            title="Retour"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h1 className="text-xl font-black tracking-tight">Commerce</h1>
-            <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-60">Wego Mall</p>
+      {/* ── Fixed Top Section ── */}
+      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#0A0A0B]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl safe-top">
+        {/* Header */}
+        <header className="px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => navigate('/services')} 
+              className="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white/5 active:scale-90 transition-all"
+              aria-label="Retour"
+              title="Retour"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="text-xl font-black tracking-tight">Commerce</h1>
+              <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-60">Wego Mall</p>
+            </div>
           </div>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => navigate('/user/notifications')}
-            aria-label="Notifications" 
-            title="Notifications"
-            className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all"
-          >
-            <Bell className="w-5 h-5 text-white/70" />
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent animate-pulse" />
-          </button>
-          <button 
-            onClick={() => setIsCartOpen(true)}
-            aria-label="Panier" 
-            title="Panier"
-            className="w-10 h-10 rounded-2xl bg-accent text-white flex items-center justify-center relative shadow-lg shadow-accent/30 active:scale-95 transition-all"
-          >
-            <ShoppingCart className="w-5 h-5" />
-            {cartCount > 0 && (
-              <motion.span 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 bg-white text-accent text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md"
-              >
-                {cartCount}
-              </motion.span>
-            )}
-          </button>
-        </div>
-      </header>
-
-      <div className="px-6 space-y-6 flex-1 pb-32">
-        {/* Search Bar */}
-        <div className="relative group">
-          <div className="absolute inset-0 bg-accent/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity rounded-3xl" />
-          <div className="relative glass rounded-[24px] flex items-center px-5 py-4 border border-white/5 focus-within:border-accent/40 transition-all">
-            <Search className="w-5 h-5 text-white/30 mr-3 group-focus-within:text-accent transition-colors" />
-            <input 
-              type="text"
-              placeholder="Rechercher un produit, une boutique..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="bg-transparent flex-1 outline-none text-sm font-semibold placeholder:text-white/20"
-            />
-            {search && (
-              <button aria-label="Effacer la recherche" onClick={() => setSearch('')} className="p-1 text-white/30 hover:text-white">
-                <X className="w-4 h-4" />
-              </button>
-            )}
-            <div className="w-[1px] h-6 bg-white/10 mx-3" />
-            <button aria-label="Filtrer" className="p-1 text-white/50 hover:text-white">
-              <Filter className="w-5 h-5" />
+          
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => navigate('/user/notifications')}
+              aria-label="Notifications" 
+              title="Notifications"
+              className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all"
+            >
+              <Bell className="w-5 h-5 text-white/70" />
+              <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent animate-pulse" />
+            </button>
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              aria-label="Panier" 
+              title="Panier"
+              className="w-10 h-10 rounded-2xl bg-accent text-white flex items-center justify-center relative shadow-lg shadow-accent/30 active:scale-95 transition-all"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 bg-white text-accent text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md"
+                >
+                  {cartCount}
+                </motion.span>
+              )}
             </button>
           </div>
+        </header>
+
+        {/* Search Bar */}
+        <div className="px-6 pb-4">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-accent/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity rounded-3xl" />
+            <div className="relative glass rounded-[24px] flex items-center px-5 py-4 border border-white/5 focus-within:border-accent/40 transition-all">
+              <Search className="w-5 h-5 text-white/30 mr-3 group-focus-within:text-accent transition-colors" />
+              <input 
+                type="text"
+                placeholder="Rechercher un produit, une boutique..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="bg-transparent flex-1 outline-none text-sm font-semibold placeholder:text-white/20"
+              />
+              {search && (
+                <button aria-label="Effacer la recherche" onClick={() => setSearch('')} className="p-1 text-white/30 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+              <div className="w-[1px] h-6 bg-white/10 mx-3" />
+              <button aria-label="Filtrer" className="p-1 text-white/50 hover:text-white">
+                <Filter className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div className="flex-1 px-6 space-y-6 pt-[180px] pb-32">
 
         {/* Categories Grid/Scroll */}
         <div className="space-y-4">

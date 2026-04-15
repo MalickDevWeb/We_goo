@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import WegoMap, { createPhotoIcon, pickupIcon, destinationIcon } from '@/components/WegoMap';
 import type { MapMarker } from '@/components/WegoMap';
 import { getRealRoute } from '@/services/mapService';
+import CameraScanner from '@/components/CameraScanner';
 
 // ─── Real Dakar coordinates ──────────────────────────────────────────────────
 // Plateau → Almadies (real Dakar streets)
@@ -42,6 +43,7 @@ const PackageTracking = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const isReceiver = location.state?.isReceiver || false;
   const pkgInitial = location.state?.package || {
     id: `WG-DEMO-${Math.floor(1000 + Math.random() * 9000)}`,
     description: 'Colis de test (Mode Démo)',
@@ -68,6 +70,7 @@ const PackageTracking = () => {
   const [showOTP, setShowOTP]             = useState(false);
   const [showPickup, setShowPickup]       = useState(true); // Default to showing pickup if status is accepted
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [scannerMode, setScannerMode] = useState<'pickup' | 'delivery' | null>(null);
   const OTP_CODE = '4729';
   const PICKUP_PIN = pkg?.pickupPin || '8821';
 
@@ -118,9 +121,10 @@ const PackageTracking = () => {
     ? route[Math.min(currentIdx, route.length - 1)]
     : origin;
 
-  // Mock stunning package photo
-  const MOCK_PHOTO = "https://images.unsplash.com/photo-1607006411005-bf3a94841b59?w=150&h=150&fit=crop";
-  const parcelIcon = pkg?.photo ? createPhotoIcon(pkg.photo) : createPhotoIcon(MOCK_PHOTO);
+  // High-quality package photos
+  const MOCK_PHOTO_SQUARE = "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=200&h=200&fit=crop&q=90";
+  const MOCK_PHOTO_WIDE   = "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=500&fit=crop&q=90";
+  const parcelIcon = pkg?.photo ? createPhotoIcon(pkg.photo) : createPhotoIcon(MOCK_PHOTO_SQUARE);
 
   const markers: MapMarker[] = [
     { key: 'origin',      position: origin,   icon: pickupIcon      },
@@ -200,7 +204,7 @@ const PackageTracking = () => {
       <div className="absolute top-4 right-4 z-[1000] safe-top flex flex-col items-end gap-2">
         <div className="glass-strong rounded-2xl px-4 py-2 border border-white/10 shadow-lg">
           <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">N° suivi</p>
-          <p className="text-xs font-black text-white tracking-wider">WG-{String(pkg?.id || 'PK1').slice(0,8).toUpperCase()}</p>
+          <p className="text-xs font-black text-white tracking-wider">{String(pkg?.id || 'PK1').startsWith('WG-') ? '' : 'WG-'}{String(pkg?.id || 'PK1').slice(0,10).toUpperCase()}</p>
         </div>
         {(pkg?.status === 'in-progress' || pkg?.status === 'arriving') && (
           <div className="flex items-center gap-1.5 bg-accent/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-accent/30 shadow-lg shadow-accent/10">
@@ -281,11 +285,19 @@ const PackageTracking = () => {
                    </div>
                    {pkg?.status === 'accepted' && (
                       <div className="flex items-center gap-3">
-                         <div className="flex-1 bg-black/40 rounded-xl p-3 border border-white/5">
-                            <p className="text-[8px] text-white/40 uppercase mb-1">PIN de Collecte</p>
-                            <p className="text-xl font-black text-accent tracking-[0.2em] font-mono">{PICKUP_PIN}</p>
-                         </div>
-                         <button onClick={simulatePickup} className="px-4 py-3 rounded-xl bg-accent text-white font-black text-[9px] uppercase tracking-widest shadow-lg shadow-accent/20 active:scale-95 transition-all">Simuler Scan</button>
+                         {!isReceiver ? (
+                           <>
+                             <div className="flex-1 bg-black/40 rounded-xl p-3 border border-white/5">
+                                <p className="text-[8px] text-white/40 uppercase mb-1">PIN de Collecte</p>
+                                <p className="text-xl font-black text-accent tracking-[0.2em] font-mono">{PICKUP_PIN}</p>
+                             </div>
+                             <button onClick={() => setScannerMode('pickup')} className="px-4 py-3 rounded-xl bg-accent text-white font-black text-[9px] uppercase tracking-widest shadow-lg shadow-accent/20 active:scale-95 transition-all">Scanner Livreur</button>
+                           </>
+                         ) : (
+                           <div className="flex-1 bg-black/40 rounded-xl p-4 border border-white/5 text-center">
+                              <p className="text-xs text-white/60 font-bold">Le livreur se rend actuellement chez l'expéditeur.</p>
+                           </div>
+                         )}
                       </div>
                    )}
                 </div>
@@ -387,7 +399,7 @@ const PackageTracking = () => {
             <p className="text-[9px] font-black text-white/40 uppercase tracking-widest mb-3">Informations colis</p>
             <div className="flex items-center gap-4 mb-4 relative z-10">
               <div className="w-14 h-14 rounded-[18px] border border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-[0_10px_20px_rgba(0,0,0,0.4)] relative">
-                <img src={pkg?.photo || MOCK_PHOTO} alt="Package" className="w-full h-full object-cover" />
+                <img src={pkg?.photo || MOCK_PHOTO_SQUARE} alt="Package" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <Package className="w-4 h-4 text-white absolute bottom-1.5 right-1.5 opacity-80" />
               </div>
@@ -402,12 +414,12 @@ const PackageTracking = () => {
             
             <div className="flex justify-between items-center bg-black/20 p-3 rounded-2xl border border-white/5 relative z-10">
               <div className="flex-1 min-w-0 pr-2">
-                <p className="text-[8px] text-white/40 mb-0.5 uppercase tracking-widest flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-accent" />Départ</p>
+                <p className="text-[8px] text-white/40 mb-0.5 uppercase tracking-widest flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-accent block" />Départ</p>
                 <p className="text-[11px] font-black text-white truncate">{pkg?.pickupAddress || 'Plateau, Dakar'}</p>
               </div>
               <div className="w-4 h-px bg-white/10 mx-2" />
               <div className="flex-1 min-w-0 pl-2 text-right">
-                <p className="text-[8px] text-white/40 mb-0.5 uppercase tracking-widest flex items-center gap-1 justify-end">Destination<div className="w-1.5 h-1.5 rounded-sm bg-white" /></p>
+                <p className="text-[8px] text-white/40 mb-0.5 uppercase tracking-widest flex items-center gap-1 justify-end">Destination<span className="w-1.5 h-1.5 rounded-sm bg-white block" /></p>
                 <p className="text-[11px] font-black text-white truncate">{pkg?.deliveryAddress || 'Almadies, Route des Mert.'}</p>
               </div>
             </div>
@@ -483,12 +495,12 @@ const PackageTracking = () => {
                         </div>
                       </div>
 
-                      {/* Simulator button for DEV/DEMO */}
+                      {/* Real Scanner button for DEV/DEMO */}
                       <button 
-                        onClick={simulateDelivery}
+                        onClick={() => setScannerMode('delivery')}
                         className="mt-6 text-[10px] font-black text-white/20 uppercase tracking-widest hover:text-accent2 transition-colors border-b border-white/5 pb-1"
                       >
-                        Simuler le scan du chauffeur (Démo)
+                        Scanner le QR du Livreur
                       </button>
                     </motion.div>
                   )}
@@ -531,7 +543,7 @@ const PackageTracking = () => {
           </div>
 
           {/* ── Cancel Button ── */}
-          {pkg?.status === 'accepted' && progress < 0.15 && (
+          {!isReceiver && pkg?.status === 'accepted' && progress < 0.15 && (
             <button 
               onClick={() => setShowCancelModal(true)}
               className="w-full mt-4 py-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive font-black text-sm active:scale-95 transition-all shadow-lg hover:bg-destructive/20 flex items-center justify-center gap-2"
@@ -547,7 +559,7 @@ const PackageTracking = () => {
       {/* ── Package Details Popup ── */}
       <AnimatePresence>
         {showPreview && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-6">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -563,7 +575,7 @@ const PackageTracking = () => {
             >
               {/* Header Image */}
               <div className="relative h-64">
-                <img src={pkg?.photo || MOCK_PHOTO} alt="Package Details" className="w-full h-full object-cover" />
+                <img src={pkg?.photo || MOCK_PHOTO_WIDE} alt="Package Details" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                 <button 
                   onClick={() => setShowPreview(false)}
@@ -654,11 +666,47 @@ const PackageTracking = () => {
                 </button>
               </div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
+           </motion.div>
+         )}
+       </AnimatePresence>
+
+       {/* ── Camera Scanner Modal ── */}
+       <AnimatePresence>
+         {scannerMode && (
+           <motion.div 
+             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+             className="fixed inset-0 z-[3000] flex flex-col items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+           >
+             <div className="w-full max-w-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-white font-black uppercase tracking-widest text-sm">
+                    {scannerMode === 'pickup' ? 'Scanner le chauffeur' : 'Valider la réception'}
+                  </h3>
+                  <button title="Fermer" aria-label="Fermer" onClick={() => setScannerMode(null)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 active:scale-95">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="rounded-[32px] overflow-hidden border-2 border-white/10 relative shadow-2xl">
+                   <div className="absolute inset-0 bg-accent/10 mix-blend-overlay z-10 pointer-events-none" />
+                   <CameraScanner onScanSuccess={(data) => {
+                     toast.success(`Scan réussi : ${data}`);
+                     if (scannerMode === 'pickup') {
+                       simulatePickup();
+                     } else {
+                       simulateDelivery();
+                     }
+                     setScannerMode(null);
+                   }} />
+                </div>
+                <p className="text-center text-xs text-white/40 mt-6 font-medium px-4">
+                  Placez le QR code affiché sur le téléphone du livreur au centre du cadre.
+                </p>
+             </div>
+           </motion.div>
+         )}
+       </AnimatePresence>
+     </div>
+   );
+ };
 
 export default PackageTracking;

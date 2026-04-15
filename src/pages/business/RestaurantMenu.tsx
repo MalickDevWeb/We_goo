@@ -34,26 +34,25 @@ const RestaurantMenu = () => {
 
   return (
     <div className="h-full bg-background flex flex-col pt-8 overflow-hidden relative">
-      {/* Header */}
-      <header className="px-6 py-4 flex items-center justify-between shrink-0 mb-4 sticky top-0 bg-background/80 backdrop-blur-xl z-20">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl glass-strong flex items-center justify-center border border-white/10">
-             <Utensils className="w-6 h-6 text-amber-500" />
+      {/* Header Area */}
+      <div className="shrink-0 z-20 bg-background/80 backdrop-blur-xl pb-4">
+        <header className="px-6 py-4 flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl glass-strong flex items-center justify-center border border-white/10">
+               <Utensils className="w-6 h-6 text-amber-500" />
+            </div>
+            <h1 className="text-2xl font-black text-white tracking-tight">Mon Menu</h1>
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">Mon Menu</h1>
-        </div>
-        <button 
-          aria-label="Ajouter un plat"
-          className="w-12 h-12 rounded-2xl bg-amber-500 text-black flex items-center justify-center shadow-lg shadow-amber-500/20 active:scale-90 transition-all"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
-      </header>
+          <button 
+            aria-label="Ajouter un plat"
+            className="w-12 h-12 rounded-2xl bg-amber-500 text-black flex items-center justify-center shadow-lg shadow-amber-500/20 active:scale-90 transition-all"
+          >
+            <Plus className="w-6 h-6" />
+          </button>
+        </header>
 
-      <main className="flex-1 overflow-y-auto no-scrollbar px-6 pb-24 relative z-10">
-        
         {/* Search & Filter */}
-        <div className="flex gap-3 mb-8">
+        <div className="flex gap-3 px-6">
            <div className="flex-1 glass-strong rounded-2xl border border-white/5 flex items-center px-4 py-3 border focus-within:border-amber-500/30 transition-all">
               <Search className="w-4 h-4 text-white/20 mr-3" />
               <input 
@@ -71,6 +70,9 @@ const RestaurantMenu = () => {
               <Filter className="w-4 h-4" />
            </button>
         </div>
+      </div>
+
+      <main className="flex-1 overflow-y-auto no-scrollbar px-6 pb-24 relative z-10 pt-4">
 
         {/* Menu List */}
         <div className="space-y-4">

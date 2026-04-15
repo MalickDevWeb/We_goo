@@ -13,7 +13,10 @@ import {
   XCircle
 } from 'lucide-react';
 
-const MOCK_HISTORY = [
+import { useSocket } from '@/services/socket';
+import { toast } from 'sonner';
+
+const INITIAL_HISTORY = [
   { id: '1022', customer: 'Fatou Kébé', total: 12500, date: 'Aujourd\'hui, 14:20', status: 'completed', items: '3x Pizza Royale, 2x Sprite' },
   { id: '1021', customer: 'Jean Mendy', total: 4200, date: 'Aujourd\'hui, 12:45', status: 'completed', items: '1x Tacos XL' },
   { id: '1020', customer: 'Saliou Ndiaye', total: 8500, date: 'Hier, 21:30', status: 'cancelled', items: 'Burger Wego, Wings' },
@@ -22,6 +25,17 @@ const MOCK_HISTORY = [
 
 const RestaurantOrders = () => {
   const [filter, setFilter] = useState('all');
+  const [orders, setOrders] = useState(INITIAL_HISTORY);
+
+  useSocket('new_restaurant_order', (order: any) => {
+     setOrders(prev => [
+       { id: order.id, customer: order.customerName, total: order.total, date: 'À l\'instant', status: 'pending', items: order.items.join(', ') },
+       ...prev
+     ]);
+     toast.success('Nouvelle Commande !', {
+        description: `${order.customerName} a commandé pour ${order.total} CFA`
+     });
+  });
 
   return (
     <div className="h-full bg-background flex flex-col pt-8 overflow-hidden relative">
@@ -54,7 +68,7 @@ const RestaurantOrders = () => {
         </div>
 
         <div className="space-y-4">
-           {MOCK_HISTORY.filter(o => filter === 'all' || o.status === filter).map((order, idx) => (
+           {orders.filter(o => filter === 'all' || o.status === filter).map((order, idx) => (
              <motion.div
                key={order.id}
                initial={{ opacity: 0, x: 20 }}

@@ -149,29 +149,36 @@ const UserRental = () => {
       <div className="fixed top-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/10 blur-[120px] rounded-full -z-10" />
       <div className="fixed bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent/10 blur-[100px] rounded-full -z-10" />
 
-      {/* Header */}
-      <header className="px-6 py-6 flex items-center justify-between sticky top-0 bg-[#0A0A0B]/80 backdrop-blur-xl z-[100]">
-        <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/services')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-2xl glass flex items-center justify-center active:scale-90 transition-all"><ArrowLeft className="w-5 h-5" /></button>
-          <div>
-            <h1 className="text-xl font-black tracking-tight uppercase">Location</h1>
-            <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-60">Wego Fleet</p>
+      {/* ── Fixed Top Section ── */}
+      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#0A0A0B]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl safe-top">
+        {/* Header */}
+        <header className="px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button onClick={() => navigate('/services')} aria-label="Retour" title="Retour" className="w-10 h-10 rounded-2xl glass flex items-center justify-center active:scale-90 transition-all"><ArrowLeft className="w-5 h-5" /></button>
+            <div>
+              <h1 className="text-xl font-black tracking-tight uppercase">Location</h1>
+              <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-60">Wego Fleet</p>
+            </div>
           </div>
-        </div>
-        <button onClick={() => navigate('/user/notifications')} aria-label="Notifications" title="Notifications" className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all">
-          <Bell className="w-5 h-5 text-white/70" />
-          <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent" />
-        </button>
-      </header>
+          <button onClick={() => navigate('/user/notifications')} aria-label="Notifications" title="Notifications" className="w-10 h-10 rounded-2xl glass flex items-center justify-center relative active:scale-90 transition-all">
+            <Bell className="w-5 h-5 text-white/70" />
+            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent" />
+          </button>
+        </header>
 
-      <div className="px-6 space-y-6 flex-1 pb-32">
-        <LocationSearchInput
-          value={search}
-          onChange={setSearch}
-          onSelect={setSearch}
-          placeholder="Rechercher un véhicule ou lieu..."
-          className="mb-2"
-        />
+        {/* Search */}
+        <div className="px-6 pb-4">
+          <LocationSearchInput
+            value={search}
+            onChange={setSearch}
+            onSelect={setSearch}
+            placeholder="Rechercher un véhicule ou lieu..."
+            className="mb-0"
+          />
+        </div>
+      </div>
+
+      <div className="flex-1 px-6 space-y-6 pt-[160px] pb-32">
 
         {/* Categories */}
         <div className="space-y-4">
